@@ -1,13 +1,16 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { cryptoCharacters } from "../data/characters";
 import CharacterSelector from "../components/CharacterSelector";
 import CharacterDetails from "../components/CharacterDetails";
 import { CryptoCharacter } from "../types/character";
-import { Coins } from "lucide-react";
+import { Coins, Gamepad } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [selectedCharacter, setSelectedCharacter] = useState<CryptoCharacter | null>(
     cryptoCharacters[0] || null
   );
@@ -36,6 +39,15 @@ const Index = () => {
 
       <main className="flex-1 container py-8">
         <div className="flex flex-col items-center justify-center space-y-8">
+          <Button 
+            onClick={() => navigate("/battle")}
+            className="bg-gradient-to-r from-game-primary to-game-secondary hover:opacity-90 transition-opacity px-8 py-6 h-auto"
+            size="lg"
+          >
+            <Gamepad className="mr-2 h-6 w-6" />
+            <span className="text-lg font-bold">Начать КриптоДуэль</span>
+          </Button>
+          
           {selectedCharacter ? (
             <>
               <div className="w-full max-w-3xl">
