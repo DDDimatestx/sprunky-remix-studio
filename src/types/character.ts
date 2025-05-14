@@ -15,4 +15,10 @@ export interface CryptoCharacter {
     intelligence: number;
     charisma: number;
   };
+  statsDescriptions?: {
+    strength: string;
+    speed: string;
+    intelligence: string;
+    charisma: string;
+  };
 }
