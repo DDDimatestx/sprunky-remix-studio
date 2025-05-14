@@ -5,12 +5,15 @@ import { cryptoCharacters } from "../data/characters";
 import CharacterSelector from "../components/CharacterSelector";
 import CharacterDetails from "../components/CharacterDetails";
 import { CryptoCharacter } from "../types/character";
-import { Coins, Gamepad, Trophy, User } from "lucide-react";
+import { Coins, Gamepad, Trophy, User, FileText } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/i18n/LanguageContext";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [selectedCharacter, setSelectedCharacter] = useState<CryptoCharacter | null>(
     cryptoCharacters[0] || null
   );
@@ -35,8 +38,8 @@ const Index = () => {
   const handleSelectCharacter = (character: CryptoCharacter) => {
     setSelectedCharacter(character);
     toast({
-      title: `${character.name} выбран!`,
-      description: `Вы выбрали ${character.symbol} - ранг #${character.rank}`,
+      title: t('home.characterSelected', { name: character.name }),
+      description: t('home.characterSelectedDesc', { symbol: character.symbol, rank: character.rank }),
       duration: 3000,
     });
   };
@@ -47,7 +50,7 @@ const Index = () => {
     setUsername(null);
     
     toast({
-      title: "Вы вышли из аккаунта",
+      title: t('common.logout'),
       description: "До новых встреч!",
     });
   };
@@ -59,11 +62,13 @@ const Index = () => {
           <h1 className="text-3xl md:text-4xl font-bold text-center flex items-center gap-3">
             <Coins className="h-8 w-8 text-game-primary" />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-game-primary to-game-secondary">
-              КриптоХерои
+              {t('home.title')}
             </span>
           </h1>
           
           <div className="flex items-center gap-3">
+            <LanguageSelector />
+            
             {isLoggedIn ? (
               <div className="flex items-center gap-3">
                 <div className="text-sm text-right">
@@ -72,7 +77,7 @@ const Index = () => {
                     onClick={handleLogout}
                     className="text-xs text-muted-foreground hover:text-primary"
                   >
-                    Выйти
+                    {t('common.logout')}
                   </button>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
@@ -86,7 +91,7 @@ const Index = () => {
                 className="flex items-center gap-2"
               >
                 <User className="h-4 w-4" />
-                Войти
+                {t('common.login')}
               </Button>
             )}
           </div>
@@ -101,7 +106,7 @@ const Index = () => {
               className="bg-gradient-to-r from-game-primary to-game-secondary hover:opacity-90 transition-opacity px-6 py-8 h-auto"
             >
               <Gamepad className="mr-2 h-6 w-6" />
-              <span className="text-lg font-bold">КриптоДуэль</span>
+              <span className="text-lg font-bold">{t('home.cryptoDuel')}</span>
             </Button>
             
             <Button 
@@ -109,27 +114,35 @@ const Index = () => {
               className="bg-gradient-to-r from-game-primary to-game-accent hover:opacity-90 transition-opacity px-6 py-8 h-auto"
             >
               <Gamepad className="mr-2 h-6 w-6" />
-              <span className="text-lg font-bold">Против Компьютера</span>
+              <span className="text-lg font-bold">{t('home.vsComputer')}</span>
             </Button>
             
             <Button 
               onClick={() => navigate("/leaderboard")}
-              className="bg-gradient-to-r from-game-yellow to-game-orange hover:opacity-90 transition-opacity px-6 py-8 h-auto col-span-1 md:col-span-2"
+              className="bg-gradient-to-r from-game-yellow to-game-orange hover:opacity-90 transition-opacity px-6 py-8 h-auto"
             >
               <Trophy className="mr-2 h-6 w-6" />
-              <span className="text-lg font-bold">Таблица лидеров</span>
+              <span className="text-lg font-bold">{t('home.leaderboard')}</span>
+            </Button>
+            
+            <Button 
+              onClick={() => navigate("/guide")}
+              className="bg-gradient-to-r from-game-accent to-game-primary/70 hover:opacity-90 transition-opacity px-6 py-8 h-auto"
+            >
+              <FileText className="mr-2 h-6 w-6" />
+              <span className="text-lg font-bold">{t('guide.title')}</span>
             </Button>
           </div>
           
           {selectedCharacter ? (
             <>
               <div className="w-full max-w-3xl">
-                <h2 className="text-xl md:text-2xl font-bold mb-6 text-center">Детали персонажа</h2>
+                <h2 className="text-xl md:text-2xl font-bold mb-6 text-center">{t('home.characterDetails')}</h2>
                 <CharacterDetails character={selectedCharacter} />
               </div>
               
               <div className="w-full pt-4">
-                <h2 className="text-xl md:text-2xl font-bold mb-6 text-center">Выберите персонажа</h2>
+                <h2 className="text-xl md:text-2xl font-bold mb-6 text-center">{t('home.selectCharacter')}</h2>
                 <CharacterSelector
                   characters={cryptoCharacters}
                   selectedCharacter={selectedCharacter}
@@ -139,7 +152,7 @@ const Index = () => {
             </>
           ) : (
             <div className="flex items-center justify-center h-64 text-center">
-              <p>Загрузка персонажей...</p>
+              <p>{t('common.loading')}</p>
             </div>
           )}
         </div>
@@ -147,7 +160,7 @@ const Index = () => {
 
       <footer className="py-4 border-t border-game-primary/20">
         <div className="container text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} КриптоХерои | Персонажи криптомонет из топ-100 CoinMarketCap
+          {t('common.copyright', { year: new Date().getFullYear() })}
         </div>
       </footer>
     </div>

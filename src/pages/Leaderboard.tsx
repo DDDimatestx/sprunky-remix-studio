@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { cryptoCharacters } from "../data/characters";
+import { useLanguage } from "@/i18n/LanguageContext";
+import LanguageSelector from "@/components/LanguageSelector";
 
 // Тип для записи в лидерборде
 interface LeaderboardEntry {
@@ -29,6 +31,7 @@ interface LeaderboardEntry {
 
 const Leaderboard = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
   const [filteredData, setFilteredData] = useState<LeaderboardEntry[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -148,14 +151,14 @@ const Leaderboard = () => {
         setIsLoading(false);
         
         toast({
-          title: "Лидерборд загружен",
-          description: "Отображены лучшие игроки КриптоДуэлей",
+          title: t("leaderboard.title"),
+          description: t("leaderboard.topPlayers"),
         });
       }, 1500);
     };
     
     fetchLeaderboardData();
-  }, []);
+  }, [t]);
 
   // Фильтрация данных при изменении поискового запроса
   useEffect(() => {
@@ -176,18 +179,23 @@ const Leaderboard = () => {
   // Получение имени персонажа по ID
   const getFavoriteCharacterName = (characterId: string): string => {
     const character = cryptoCharacters.find(char => char.id === characterId);
-    return character ? character.name : "Неизвестно";
+    return character ? character.name : t("common.notFound");
   };
 
   // Форматирование даты последней игры
   const formatLastPlayed = (dateString: string): string => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('ru-RU', {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
+    return new Intl.DateTimeFormat(
+      document.documentElement.lang === 'ru' ? 'ru-RU' : 
+      document.documentElement.lang === 'zh' ? 'zh-CN' : 
+      'en-US', 
+      {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit'
+      }
+    ).format(date);
   };
 
   return (
@@ -200,32 +208,35 @@ const Leaderboard = () => {
             onClick={() => navigate("/")}
           >
             <ArrowLeft className="h-4 w-4" />
-            Назад
+            {t("common.back")}
           </Button>
           <h1 className="text-3xl md:text-4xl font-bold text-center flex items-center gap-3">
             <Trophy className="h-8 w-8 text-game-yellow" />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-game-primary to-game-orange">
-              Лидерборд
+              {t("leaderboard.title")}
             </span>
           </h1>
-          <Button 
-            variant="outline" 
-            className="flex items-center gap-2"
-            onClick={() => navigate("/battle-vs-computer")}
-          >
-            <Gamepad className="h-4 w-4" />
-            Играть
-          </Button>
+          <div className="flex gap-2">
+            <LanguageSelector />
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
+              onClick={() => navigate("/battle-vs-computer")}
+            >
+              <Gamepad className="h-4 w-4" />
+              {t("common.play")}
+            </Button>
+          </div>
         </div>
       </header>
 
       <main className="flex-1 container py-8">
         <div className="flex flex-col space-y-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">Лучшие игроки</h2>
+            <h2 className="text-2xl font-bold">{t("leaderboard.topPlayers")}</h2>
             <div className="w-64">
               <Input 
-                placeholder="Поиск по имени или персонажу" 
+                placeholder={t("leaderboard.searchPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -235,7 +246,7 @@ const Leaderboard = () => {
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-64 space-y-4">
               <div className="w-12 h-12 rounded-full border-4 border-game-primary border-t-transparent animate-spin"></div>
-              <p className="text-muted-foreground">Загрузка данных лидерборда...</p>
+              <p className="text-muted-foreground">{t("common.loading")}</p>
             </div>
           ) : (
             <div className="bg-white/50 backdrop-blur-sm rounded-lg border shadow-sm overflow-hidden">
@@ -243,13 +254,13 @@ const Leaderboard = () => {
                 <TableHeader>
                   <TableRow className="bg-secondary/30">
                     <TableHead className="w-12 text-center">#</TableHead>
-                    <TableHead>Игрок</TableHead>
-                    <TableHead className="text-center">Победы</TableHead>
-                    <TableHead className="text-center">Поражения</TableHead>
-                    <TableHead className="text-center">Ничьи</TableHead>
-                    <TableHead className="text-center">Счет</TableHead>
-                    <TableHead>Любимый персонаж</TableHead>
-                    <TableHead className="text-right">Последняя игра</TableHead>
+                    <TableHead>{t("leaderboard.player")}</TableHead>
+                    <TableHead className="text-center">{t("leaderboard.wins")}</TableHead>
+                    <TableHead className="text-center">{t("leaderboard.losses")}</TableHead>
+                    <TableHead className="text-center">{t("leaderboard.draws")}</TableHead>
+                    <TableHead className="text-center">{t("leaderboard.score")}</TableHead>
+                    <TableHead>{t("leaderboard.favoriteCharacter")}</TableHead>
+                    <TableHead className="text-right">{t("leaderboard.lastPlayed")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -301,7 +312,7 @@ const Leaderboard = () => {
                   {filteredData.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                        Игроки не найдены
+                        {t("leaderboard.noPlayersFound")}
                       </TableCell>
                     </TableRow>
                   )}
@@ -313,14 +324,12 @@ const Leaderboard = () => {
           <div className="rounded-lg bg-game-primary/10 p-6 border border-game-primary/20">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Trophy className="h-5 w-5 text-game-orange" />
-              Как попасть в лидерборд?
+              {t("leaderboard.howToJoin")}
             </h3>
             <ul className="space-y-2 text-muted-foreground list-disc list-inside">
-              <li>Выигрывайте больше матчей в режиме против компьютера</li>
-              <li>За каждую победу вы получаете 3 очка</li>
-              <li>За ничью вы получаете 1 очко</li>
-              <li>Лидерборд обновляется в реальном времени</li>
-              <li>Топ-3 игрока в конце месяца получат специальные награды</li>
+              {Array.isArray(t("leaderboard.howToJoinDesc")) && (t("leaderboard.howToJoinDesc") as string[]).map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
             </ul>
           </div>
         </div>
@@ -328,7 +337,7 @@ const Leaderboard = () => {
 
       <footer className="py-4 border-t border-game-primary/20">
         <div className="container text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} КриптоХерои | Персонажи криптомонет из топ-100 CoinMarketCap
+          {t("common.copyright", { year: new Date().getFullYear() })}
         </div>
       </footer>
     </div>
