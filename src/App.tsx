@@ -1,10 +1,9 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { LanguageProvider } from "@/i18n/LanguageContext";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { LanguageProvider, useLanguage } from "@/i18n/LanguageContext";
 import Index from "./pages/Index";
 import Battle from "./pages/Battle";
 import BattleVsComputer from "./pages/BattleVsComputer";
@@ -16,6 +15,26 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const AppRoutes = () => {
+  const { language } = useLanguage();
+
+  return (
+    <Routes>
+      {/* Автоматически переадресовываем с "/" на текущий язык */}
+      <Route path="/" element={<Navigate to={`/${language}`} replace />} />
+      
+      <Route path="/:lang" element={<Index />} />
+      <Route path="/:lang/battle" element={<Battle />} />
+      <Route path="/:lang/battle-vs-computer" element={<BattleVsComputer />} />
+      <Route path="/:lang/leaderboard" element={<Leaderboard />} />
+      <Route path="/:lang/auth" element={<Auth />} />
+      <Route path="/:lang/guide" element={<Guide />} />
+      <Route path="/:lang/instructions" element={<Instructions />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
@@ -23,17 +42,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/battle" element={<Battle />} />
-            <Route path="/battle-vs-computer" element={<BattleVsComputer />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/guide" element={<Guide />} />
-            <Route path="/instructions" element={<Instructions />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AppRoutes />
         </BrowserRouter>
       </TooltipProvider>
     </LanguageProvider>
