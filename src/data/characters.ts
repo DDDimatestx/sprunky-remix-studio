@@ -9,7 +9,7 @@ export const cryptoCharacters: CryptoCharacter[] = [
     rank: 1,
     price: 62341.23,
     marketCap: 1228642378901,
-    image: "/placeholder.svg",
+    image: "/images/bitcoin.png",
     color: "#F7931A",
     description: "Король криптовалют, золотой стандарт цифровых активов с ограниченным предложением и высокой безопасностью.",
     stats: {
