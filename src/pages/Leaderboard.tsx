@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -326,13 +327,16 @@ const Leaderboard = () => {
               {t("leaderboard.howToJoin")}
             </h3>
             <ul className="space-y-2 text-muted-foreground list-disc list-inside">
-              {/* Fixed typecasting issue here - check if it's an array before mapping */}
-              {Array.isArray(t("leaderboard.howToJoinDesc")) 
-                ? (t("leaderboard.howToJoinDesc") as string[]).map((item, index) => (
+              {(() => {
+                const howToJoinDesc = t("leaderboard.howToJoinDesc");
+                if (Array.isArray(howToJoinDesc)) {
+                  return howToJoinDesc.map((item: string, index: number) => (
                     <li key={index}>{item}</li>
-                  ))
-                : <li>{String(t("leaderboard.howToJoinDesc"))}</li>
-              }
+                  ));
+                } else {
+                  return <li>{String(howToJoinDesc)}</li>;
+                }
+              })()}
             </ul>
           </div>
         </div>
