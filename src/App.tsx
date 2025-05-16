@@ -41,9 +41,9 @@ const App = () => (
     <BrowserRouter>
       <LanguageProvider>
         <TooltipProvider>
+          <AppRoutes />
           <Toaster />
           <Sonner />
-          <AppRoutes />
         </TooltipProvider>
       </LanguageProvider>
     </BrowserRouter>
