@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CryptoHeroes Admin Guide</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1, h2, h3, h4 {
+      color: #7367F0;
+      margin-top: 1.5em;
+    }
+    h1 {
+      border-bottom: 2px solid #7367F0;
+      padding-bottom: 10px;
+    }
+    code {
+      background-color: #f4f4f8;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-family: Consolas, Monaco, 'Andale Mono', monospace;
+      font-size: 0.9em;
+    }
+    pre {
+      background-color: #f4f4f8;
+      padding: 15px;
+      border-radius: 5px;
+      overflow: auto;
+    }
+    pre code {
+      background-color: transparent;
+      padding: 0;
+    }
+    .note {
+      background-color: #fffde7;
+      border-left: 4px solid #ffd600;
+      padding: 1em;
+      margin: 1em 0;
+      border-radius: 0 5px 5px 0;
+    }
+    .tip {
+      background-color: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      padding: 1em;
+      margin: 1em 0;
+      border-radius: 0 5px 5px 0;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1em 0;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px;
+      border: 1px solid #ddd;
+    }
+    tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+    th {
+      background-color: #7367F0;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>CryptoHeroes Admin Guide</h1>
+  <p>This guide contains information on how to configure and modify the CryptoHeroes application.</p>
+  
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#adding-characters">Adding New Characters</a></li>
+    <li><a href="#adding-sounds">Adding Sound Effects</a></li>
+    <li><a href="#ui-changes">Changing the Interface</a></li>
+    <li><a href="#localization">Localization</a></li>
+    <li><a href="#deployment">Deploying the Application</a></li>
+  </ol>
+  
+  <h2 id="adding-characters">1. Adding New Characters</h2>
+  <p>Characters are defined in the <code>src/data/characters.ts</code> file. Each character has the following structure:</p>
+  
+  <pre><code>interface CryptoCharacter {
+  id: string;          // Unique identifier (e.g., "bitcoin")
+  name: string;        // Display name of the character
+  symbol: string;      // Cryptocurrency symbol (e.g., "BTC")
+  rank: number;        // Rank in cryptocurrency rating
+  price: number;       // Price in USD
+  marketCap: number;   // Market capitalization in USD
+  image: string;       // URL to image (can be added to public/images)
+  color: string;       // Primary color (in HEX format, e.g., "#F7931A")
+  description: string; // Brief description of the character
+  stats: {
+    strength: number;     // Strength indicator (1-100)
+    speed: number;        // Speed indicator (1-100)
+    intelligence: number; // Intelligence indicator (1-100)
+    charisma: number;     // Charisma indicator (1-100)
+  };
+  statsDescriptions?: {   // Description of indicators (optional)
+    strength: string;     // Description of strength
+    speed: string;        // Description of speed
+    intelligence: string; // Description of intelligence
+    charisma: string;     // Description of charisma
+  };
+}</code></pre>
+  
+  <p>To add a new character:</p>
+  <ol>
+    <li>Add the character image to the <code>public/images/</code> folder (recommended size 512x512px, PNG format with transparent background)</li>
+    <li>Open the file <code>src/data/characters.ts</code></li>
+    <li>Add a new object to the <code>cryptoCharacters</code> array</li>
+  </ol>
+  
+  <p>Example of adding a new character:</p>
+  <pre><code>{
+  id: "avalanche",
+  name: "Avalanche",
+  symbol: "AVAX",
+  rank: 11,
+  price: 34.25,
+  marketCap: 12500000000,
+  image: "/images/avalanche.png",
+  color: "#E84142",
+  description: "Fast, low-cost, and environmentally friendly platform for dApps and systems with multiple blockchains.",
+  stats: {
+    strength: 76,
+    speed: 92,
+    intelligence: 84,
+    charisma: 71
+  },
+  statsDescriptions: {
+    strength: "High market capitalization and stability",
+    speed: "One of the fastest networks with high throughput",
+    intelligence: "Advanced consensus technology and smart contracts",
+    charisma: "Growing community of developers and users"
+  }
+}</code></pre>
+  
+  <h2 id="adding-sounds">2. Adding Sound Effects</h2>
+  <p>To add sounds to the game:</p>
+  <ol>
+    <li>Add audio files in MP3 or WAV format to the <code>public/sounds/</code> folder</li>
+    <li>If the <code>useSoundEffects</code> hook does not exist, create a file <code>src/hooks/use-sound-effects.ts</code>:</li>
+  </ol>
+  
+  <pre><code>import { useState, useEffect } from 'react';
+
+type SoundType = 'battle' | 'win' | 'lose' | 'draw' | 'select' | 'click';
+
+const soundFiles: Record&lt;SoundType, string&gt; = {
+  battle: '/sounds/battle.mp3',
+  win: '/sounds/win.mp3',
+  lose: '/sounds/lose.mp3',
+  draw: '/sounds/draw.mp3',
+  select: '/sounds/select.mp3',
+  click: '/sounds/click.mp3',
+};
+
+export const useSoundEffects = () => {
+  const [sounds, setSounds] = useState&lt;Record&lt;SoundType, HTMLAudioElement | null&gt;&gt;({
+    battle: null,
+    win: null,
+    lose: null,
+    draw: null,
+    select: null,
+    click: null,
+  });
+  
+  const [isMuted, setIsMuted] = useState(() => {
+    const saved = localStorage.getItem('sound-muted');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  useEffect(() => {
+    // Initialize audio elements
+    const audioElements: Record&lt;SoundType, HTMLAudioElement&gt; = {
+      battle: new Audio(soundFiles.battle),
+      win: new Audio(soundFiles.win),
+      lose: new Audio(soundFiles.lose),
+      draw: new Audio(soundFiles.draw),
+      select: new Audio(soundFiles.select),
+      click: new Audio(soundFiles.click),
+    };
+    
+    // Preload
+    Object.values(audioElements).forEach(audio => {
+      audio.load();
+      audio.volume = 0.5; // Default volume level
+    });
+    
+    setSounds(audioElements);
+    
+    // Cleanup on unmount
+    return () => {
+      Object.values(audioElements).forEach(audio => {
+        audio.pause();
+        audio.src = '';
+      });
+    };
+  }, []);
+
+  const toggleMute = () => {
+    const newMuted = !isMuted;
+    setIsMuted(newMuted);
+    localStorage.setItem('sound-muted', JSON.stringify(newMuted));
+  };
+
+  const playSound = (type: SoundType) => {
+    if (!isMuted && sounds[type]) {
+      sounds[type]!.currentTime = 0;
+      sounds[type]!.play();
+    }
+  };
+
+  return { playSound, isMuted, toggleMute };
+};</code></pre>
+  
+  <p>Usage in components:</p>
+  <pre><code>import { useSoundEffects } from '../hooks/use-sound-effects';
+
+const BattleComponent = () => {
+  const { playSound, isMuted, toggleMute } = useSoundEffects();
+  
+  const startBattle = () => {
+    playSound('battle');
+    // Other actions...
+  };
+  
+  return (
+    &lt;div&gt;
+      &lt;button onClick={toggleMute}&gt;
+        {isMuted ? 'Enable Sound' : 'Disable Sound'}
+      &lt;/button&gt;
+      &lt;button onClick={startBattle}&gt;
+        Start Duel
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+};</code></pre>
+  
+  <h2 id="ui-changes">3. Changing the Interface</h2>
+  <h3>Main Components and Their Location</h3>
+  <ul>
+    <li><strong>Home Page</strong>: <code>src/pages/Index.tsx</code></li>
+    <li><strong>Duel Page</strong>: <code>src/pages/Battle.tsx</code></li>
+    <li><strong>Vs Computer Page</strong>: <code>src/pages/BattleVsComputer.tsx</code></li>
+    <li><strong>Leaderboard</strong>: <code>src/pages/Leaderboard.tsx</code></li>
+    <li><strong>Instructions</strong>: <code>src/pages/Instructions.tsx</code></li>
+    <li><strong>Game Guide</strong>: <code>src/pages/Guide.tsx</code></li>
+  </ul>
+  
+  <h3>Styles and Themes</h3>
+  <p>The application uses Tailwind CSS for styling. The main colors are defined in the <code>tailwind.config.ts</code> file:</p>
+  <pre><code>const colors = {
+  "game-primary": "#7367F0",
+  "game-secondary": "#9E95F5",
+  "game-accent": "#28C76F",
+  "game-yellow": "#FF9F43",
+  "game-orange": "#FF6B4A",
+};</code></pre>
+  <p>To change the color scheme of the application, edit these values.</p>
+  
+  <h3>Adding a New Page</h3>
+  <ol>
+    <li>Create a new file in the <code>src/pages/</code> folder, for example <code>src/pages/NewPage.tsx</code></li>
+    <li>Add the page component:</li>
+  </ol>
+  <pre><code>import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
+import PageLayout from "@/components/layouts/PageLayout";
+
+const NewPage = () => {
+  const navigate = useNavigate();
+  const { t, language } = useLanguage();
+
+  return (
+    &lt;PageLayout title="New Page Title"&gt;
+      &lt;Button 
+        variant="outline" 
+        className="mb-6 flex items-center gap-2"
+        onClick={() => navigate(`/${language}`)}
+      &gt;
+        &lt;ArrowLeft className="h-4 w-4" /&gt;
+        Return to Menu
+      &lt;/Button&gt;
+
+      {/* Page content */}
+      &lt;div className="bg-white/30 backdrop-blur-sm rounded-lg border p-6"&gt;
+        &lt;h2&gt;New Page Content&lt;/h2&gt;
+        &lt;p&gt;Content goes here...&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/PageLayout&gt;
+  );
+};
+
+export default NewPage;</code></pre>
+  
+  <ol start="3">
+    <li>Add a route in <code>src/App.tsx</code>:</li>
+  </ol>
+  <pre><code>import NewPage from "./pages/NewPage";
+
+// ...
+
+&lt;Routes&gt;
+  {/* ... existing routes */}
+  &lt;Route path="/:lang/new-page" element={&lt;NewPage /&gt;} /&gt;
+  &lt;Route path="*" element={&lt;NotFound /&gt;} /&gt;
+&lt;/Routes&gt;</code></pre>
+  
+  <ol start="4">
+    <li>Add a link to the new page where needed, such as in the menu or on the main page.</li>
+  </ol>
+  
+  <h2 id="localization">4. Localization</h2>
+  <p>The application supports multilingualism using a localization system. Localization files are located in the <code>src/i18n/locales/</code> folder:</p>
+  <ul>
+    <li>English: <code>src/i18n/locales/en.ts</code></li>
+    <li>Russian: <code>src/i18n/locales/ru.ts</code></li>
+    <li>Chinese: <code>src/i18n/locales/zh.ts</code></li>
+  </ul>
+  
+  <h3>Adding a New Language</h3>
+  <ol>
+    <li>Create a new file in the <code>src/i18n/locales/</code> folder, for example <code>src/i18n/locales/es.ts</code> for Spanish</li>
+    <li>Copy the structure from an existing localization file and translate all strings</li>
+    <li>Update the file <code>src/i18n/LanguageContext.tsx</code> by adding the new language:</li>
+  </ol>
+  <pre><code>// Import the new localization file
+import { esTranslations } from './locales/es';
+
+// Add to the translations object
+const translations: Record<string, any> = {
+  en: enTranslations,
+  ru: ruTranslations,
+  zh: zhTranslations,
+  es: esTranslations, // Add the new language
+};
+
+// Add to the languages array
+const languages = [
+  { code: 'en', name: 'English' },
+  { code: 'ru', name: 'Русский' },
+  { code: 'zh', name: '中文' },
+  { code: 'es', name: 'Español' }, // Add the new language
+];</code></pre>
+  
+  <h3>Adding New Localization Strings</h3>
+  <ol>
+    <li>Add new keys and values to the localization files in the appropriate sections</li>
+    <li>Use the <code>t()</code> function to access these strings in components:</li>
+  </ol>
+  <pre><code>import { useLanguage } from "@/i18n/LanguageContext";
+
+const Component = () => {
+  const { t } = useLanguage();
+  
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;{t('section.newKey')}&lt;/h1&gt;
+    &lt;/div&gt;
+  );
+};</code></pre>
+  
+  <h2 id="deployment">5. Deploying the Application</h2>
+  <h3>Building the Project</h3>
+  <pre><code># Install dependencies
+npm install
+
+# Build the project
+npm run build</code></pre>
+  <p>After running these commands, the built project will be in the <code>dist</code> folder.</p>
+  
+  <h3>Deploying to Your Hosting</h3>
+  <p>To deploy to your hosting or domain:</p>
+  <ol>
+    <li>Upload the build to the web server:</li>
+  </ol>
+  <pre><code># Copy all files from the dist folder to your server
+scp -r ./dist/* user@your-server:/path/to/www/</code></pre>
+  
+  <ol start="2">
+    <li>Configure the web server:</li>
+  </ol>
+  
+  <p>For Nginx:</p>
+  <pre><code>server {
+    listen 80;
+    server_name your-domain.com;
+    root /path/to/www;
+    
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+    
+    # Caching static files
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+}</code></pre>
+  
+  <p>For Apache (.htaccess):</p>
+  <pre><code>&lt;IfModule mod_rewrite.c&gt;
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+&lt;/IfModule&gt;</code></pre>
+  
+  <h3>Deploying to GitHub Pages</h3>
+  <ol>
+    <li>Install the gh-pages package:</li>
+  </ol>
+  <pre><code>npm install --save-dev gh-pages</code></pre>
+  
+  <ol start="2">
+    <li>Add to package.json:</li>
+  </ol>
+  <pre><code>"homepage": "https://username.github.io/repo-name",
+"scripts": {
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d dist"
+}</code></pre>
+  
+  <ol start="3">
+    <li>Run the command:</li>
+  </ol>
+  <pre><code>npm run deploy</code></pre>
+  
+  <h3>Deploying to Vercel or Netlify</h3>
+  <p>These platforms allow you to deploy directly from a repository:</p>
+  <ol>
+    <li>Connect your repository to Vercel or Netlify</li>
+    <li>Specify the build command: <code>npm run build</code></li>
+    <li>Specify the publish directory: <code>dist</code></li>
+    <li>Set environment variables if necessary</li>
+  </ol>
+  
+  <h2>Conclusion</h2>
+  <p>This guide covers the basic aspects of configuring and modifying the CryptoHeroes application. For more complex changes, a deeper understanding of React and TypeScript may be required.</p>
+  <p>If you have questions or issues, contact the application developers or open an issue in the project repository.</p>
+
+  <div class="note">
+    <strong>Note:</strong> This guide is for administrators only and contains technical information. For player instructions, refer to the Guide and Instructions pages within the app.
+  </div>
+</body>
+</html>

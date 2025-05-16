@@ -4,14 +4,17 @@ import { useNavigate } from "react-router-dom";
 import { cryptoCharacters } from "../data/characters";
 import { CryptoCharacter } from "../types/character";
 import { Button } from "@/components/ui/button";
-import { Gamepad, Trophy, Cpu } from "lucide-react";
+import { Gamepad, Trophy, Cpu, ArrowLeft } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import CharacterBattleCard from "@/components/CharacterBattleCard";
 import BattleArena from "@/components/BattleArena";
 import { getRandomCharacter } from "@/lib/game-utils";
+import { useLanguage } from "@/i18n/LanguageContext";
+import PageLayout from "@/components/layouts/PageLayout";
 
 const BattleVsComputer = () => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
   const [playerCharacter, setPlayerCharacter] = useState<CryptoCharacter | null>(null);
   const [computerCharacter, setComputerCharacter] = useState<CryptoCharacter | null>(null);
   const [battleStatus, setBattleStatus] = useState<"selecting" | "ready" | "battling" | "results">("selecting");
@@ -23,18 +26,18 @@ const BattleVsComputer = () => {
     score: { player: 0, computer: 0 }
   });
   
-  // Автоматический выбор персонажа компьютера при выборе игрока
+  // Automatically select computer character when player chooses
   useEffect(() => {
     if (playerCharacter && battleStatus === "selecting") {
-      // Небольшая задержка для эффекта "думания" компьютера
+      // Small delay for "thinking" effect
       const timer = setTimeout(() => {
-        // Выбираем случайного персонажа, отличного от игрока
+        // Choose random character different from player
         const randomCharacter = getRandomCharacter(cryptoCharacters, playerCharacter.id);
         setComputerCharacter(randomCharacter);
         
         toast({
-          title: `Компьютер выбрал ${randomCharacter.name}!`,
-          description: `Компьютер будет сражаться с помощью ${randomCharacter.symbol}`,
+          title: `Computer selected ${randomCharacter.name}!`,
+          description: `Computer will battle using ${randomCharacter.symbol}`,
         });
         
         setBattleStatus("ready");
@@ -48,8 +51,8 @@ const BattleVsComputer = () => {
     setPlayerCharacter(character);
     
     toast({
-      title: `${character.name} выбран!`,
-      description: `Вы выбрали ${character.symbol} для сражения против компьютера`,
+      title: `${character.name} selected!`,
+      description: `You chose ${character.symbol} to battle against the computer`,
       duration: 2000,
     });
   };
@@ -59,7 +62,7 @@ const BattleVsComputer = () => {
     
     setBattleStatus("battling");
     
-    // Имитация процесса битвы с таймером для визуального эффекта
+    // Visual battle process with timer
     setTimeout(() => {
       const playerScore = calculateBattleScore(playerCharacter);
       const computerScore = calculateBattleScore(computerCharacter);
@@ -73,40 +76,40 @@ const BattleVsComputer = () => {
       setBattleResult(result);
       setBattleStatus("results");
       
-      // Сохраняем результат в локальное хранилище для статистики
+      // Save result to localStorage for statistics
       saveGameResult(playerCharacter.id, computerCharacter.id, result.winner?.id === playerCharacter.id);
       
       if (result.winner?.id === playerCharacter.id) {
         toast({
-          title: `Вы победили!`,
-          description: `Счет: ${result.score.player} против ${result.score.computer}`,
+          title: `You won!`,
+          description: `Score: ${result.score.player} vs ${result.score.computer}`,
           duration: 5000,
         });
       } else if (result.winner?.id === computerCharacter.id) {
         toast({
-          title: `Компьютер победил!`,
-          description: `Счет: ${result.score.player} против ${result.score.computer}`,
+          title: `Computer won!`,
+          description: `Score: ${result.score.player} vs ${result.score.computer}`,
           duration: 5000,
         });
       } else {
         toast({
-          title: "Ничья!",
-          description: `Оба персонажа набрали ${result.score.player} очков`,
+          title: "It's a draw!",
+          description: `Both characters scored ${result.score.player} points`,
           duration: 5000,
         });
       }
     }, 2500);
   };
 
-  // Расчет боевой эффективности на основе характеристик
+  // Calculate battle score based on character stats
   const calculateBattleScore = (character: CryptoCharacter): number => {
-    // Случайный фактор для непредсказуемости (от 0.8 до 1.2)
+    // Random factor for unpredictability (0.8 to 1.2)
     const randomFactor = 0.8 + Math.random() * 0.4;
     
-    // Бонус за ранг (чем ниже ранг, тем выше бонус)
+    // Rank bonus (lower rank = higher bonus)
     const rankBonus = Math.max(0, 11 - character.rank) * 2;
     
-    // Основной счет на основе характеристик
+    // Base score from stats
     const baseScore = (
       character.stats.strength * 1.2 +
       character.stats.speed * 0.8 +
@@ -114,16 +117,16 @@ const BattleVsComputer = () => {
       character.stats.charisma * 0.5
     );
     
-    // Бонус за рыночную капитализацию (логарифмический масштаб)
+    // Market cap bonus (logarithmic scale)
     const marketCapBonus = Math.log10(character.marketCap / 1e9) * 5;
     
     return Math.round((baseScore + rankBonus + marketCapBonus) * randomFactor);
   };
   
-  // Сохранение результата игры
+  // Save game result
   const saveGameResult = (playerId: string, computerId: string, isPlayerWin: boolean) => {
-    // В реальном приложении здесь будет сохранение в базу данных
-    // Пока сохраняем в localStorage для демонстрации
+    // In a real app this would save to a database
+    // For now we just save to localStorage for demonstration
     const gameHistory = JSON.parse(localStorage.getItem('gameHistory') || '[]');
     gameHistory.push({
       date: new Date().toISOString(),
@@ -142,42 +145,32 @@ const BattleVsComputer = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-game-primary/5 to-game-secondary/10">
-      <header className="w-full py-6 border-b border-game-primary/20">
-        <div className="container flex items-center justify-between">
-          <Button 
-            variant="outline" 
-            className="flex items-center gap-2"
-            onClick={() => navigate("/")}
-          >
-            Назад
-          </Button>
-          <h1 className="text-3xl md:text-4xl font-bold text-center flex items-center gap-3">
-            <Gamepad className="h-8 w-8 text-game-primary" />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-game-primary to-game-secondary">
-              Против Компьютера
-            </span>
-          </h1>
-          <Button 
-            variant="outline" 
-            className="flex items-center gap-2"
-            onClick={() => navigate("/leaderboard")}
-          >
-            <Trophy className="h-5 w-5 text-game-yellow" />
-            Лидерборд
-          </Button>
-        </div>
-      </header>
+    <PageLayout>
+      <div className="container py-8">
+        <Button 
+          variant="outline" 
+          className="mb-6 flex items-center gap-2"
+          onClick={() => navigate(`/${language}`)}
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Return to Menu
+        </Button>
+        
+        <h1 className="text-3xl font-bold text-center mb-8 flex items-center justify-center gap-3">
+          <Gamepad className="h-8 w-8 text-game-primary" />
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-game-primary to-game-secondary">
+            Battle vs Computer
+          </span>
+        </h1>
 
-      <main className="flex-1 container py-8">
         <div className="flex flex-col items-center justify-center space-y-8">
           {battleStatus === "selecting" && (
             <div className="w-full max-w-3xl text-center space-y-6">
-              <h2 className="text-xl md:text-2xl font-bold">Выберите своего персонажа</h2>
+              <h2 className="text-xl md:text-2xl font-bold">Select Your Character</h2>
               
               <div className="flex flex-col md:flex-row gap-8 items-center justify-center">
                 <div className="space-y-4 w-full md:w-1/2">
-                  <h3 className="font-medium text-lg">Ваш персонаж</h3>
+                  <h3 className="font-medium text-lg">Your Character</h3>
                   <div className="border-2 border-dashed border-game-primary/30 rounded-xl p-6 min-h-[300px] flex items-center justify-center">
                     {playerCharacter ? (
                       <CharacterBattleCard 
@@ -187,7 +180,7 @@ const BattleVsComputer = () => {
                       />
                     ) : (
                       <div className="flex flex-col items-center gap-4">
-                        <p className="text-muted-foreground">Выберите персонажа из списка ниже</p>
+                        <p className="text-muted-foreground">Select a character from the list below</p>
                         <div className="w-16 h-16 rounded-full bg-game-primary/20 flex items-center justify-center animate-pulse">
                           <Gamepad className="h-8 w-8 text-game-primary" />
                         </div>
@@ -197,7 +190,7 @@ const BattleVsComputer = () => {
                 </div>
                 
                 <div className="space-y-4 w-full md:w-1/2">
-                  <h3 className="font-medium text-lg">Компьютер</h3>
+                  <h3 className="font-medium text-lg">Computer</h3>
                   <div className="border-2 border-dashed border-game-secondary/30 rounded-xl p-6 min-h-[300px] flex items-center justify-center">
                     {computerCharacter ? (
                       <CharacterBattleCard 
@@ -206,7 +199,7 @@ const BattleVsComputer = () => {
                       />
                     ) : (
                       <div className="flex flex-col items-center gap-4">
-                        <p className="text-muted-foreground">Компьютер выберет противника после вашего выбора</p>
+                        <p className="text-muted-foreground">Computer will select an opponent after your choice</p>
                         <div className="w-16 h-16 rounded-full bg-game-secondary/20 flex items-center justify-center animate-pulse">
                           <Cpu className="h-8 w-8 text-game-secondary" />
                         </div>
@@ -224,7 +217,7 @@ const BattleVsComputer = () => {
                     isSelected={playerCharacter?.id === character.id || computerCharacter?.id === character.id}
                     onClick={() => {
                       if (playerCharacter?.id === character.id || computerCharacter?.id === character.id) {
-                        return; // Уже выбран
+                        return; // Already selected
                       }
                       
                       handleSelectCharacter(character);
@@ -237,7 +230,7 @@ const BattleVsComputer = () => {
           
           {battleStatus === "ready" && playerCharacter && computerCharacter && (
             <div className="w-full max-w-4xl animate-slide-up">
-              <h2 className="text-xl md:text-2xl font-bold mb-8 text-center">Готово к битве!</h2>
+              <h2 className="text-xl md:text-2xl font-bold mb-8 text-center">Ready for Battle!</h2>
               
               <div className="flex flex-col md:flex-row items-center justify-center gap-8">
                 <CharacterBattleCard character={playerCharacter} large showStats />
@@ -249,7 +242,7 @@ const BattleVsComputer = () => {
                   
                   <Button onClick={startBattle} className="px-8 py-6 h-auto text-lg">
                     <Gamepad className="mr-2 h-5 w-5" />
-                    Начать бой!
+                    Start Battle!
                   </Button>
                 </div>
                 
@@ -274,14 +267,14 @@ const BattleVsComputer = () => {
                 
                 <h2 className="text-2xl md:text-3xl font-bold text-center">
                   {battleResult.winner?.id === playerCharacter.id
-                    ? "Вы победили!" 
+                    ? "You Won!" 
                     : battleResult.winner?.id === computerCharacter.id
-                    ? "Компьютер победил!"
-                    : "Ничья!"}
+                    ? "Computer Won!"
+                    : "It's a Draw!"}
                 </h2>
                 
                 <p className="text-lg text-muted-foreground">
-                  Счет: {battleResult.score.player} против {battleResult.score.computer}
+                  Score: {battleResult.score.player} vs {battleResult.score.computer}
                 </p>
               </div>
               
@@ -294,27 +287,29 @@ const BattleVsComputer = () => {
                     highlighted={battleResult.winner?.id === playerCharacter.id}
                   />
                   <div className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm rounded-full px-3 py-1 font-bold border">
-                    {battleResult.score.player} очков
+                    {battleResult.score.player} points
                   </div>
                 </div>
                 
                 <div className="flex flex-col items-center gap-4">
                   <Button onClick={resetBattle} className="px-6 py-2">
-                    Новый бой
+                    New Battle
                   </Button>
                   <Button 
                     variant="outline" 
-                    onClick={() => navigate("/")}
+                    onClick={() => navigate(`/${language}`)}
+                    className="flex items-center gap-2"
                   >
-                    К списку персонажей
+                    <ArrowLeft className="h-4 w-4" />
+                    Return to Menu
                   </Button>
                   <Button 
                     variant="outline" 
-                    onClick={() => navigate("/leaderboard")}
+                    onClick={() => navigate(`/${language}/leaderboard`)}
                     className="flex items-center gap-2"
                   >
                     <Trophy className="h-4 w-4" />
-                    Лидерборд
+                    Leaderboard
                   </Button>
                 </div>
                 
@@ -326,21 +321,15 @@ const BattleVsComputer = () => {
                     highlighted={battleResult.winner?.id === computerCharacter.id}
                   />
                   <div className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm rounded-full px-3 py-1 font-bold border">
-                    {battleResult.score.computer} очков
+                    {battleResult.score.computer} points
                   </div>
                 </div>
               </div>
             </div>
           )}
         </div>
-      </main>
-
-      <footer className="py-4 border-t border-game-primary/20">
-        <div className="container text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} КриптоХерои | Персонажи криптомонет из топ-100 CoinMarketCap
-        </div>
-      </footer>
-    </div>
+      </div>
+    </PageLayout>
   );
 };
 
