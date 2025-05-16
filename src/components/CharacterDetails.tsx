@@ -3,13 +3,16 @@ import { CryptoCharacter } from "../types/character";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Coins, DollarSign } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface CharacterDetailsProps {
   character: CryptoCharacter;
 }
 
 const CharacterDetails = ({ character }: CharacterDetailsProps) => {
-  // Форматирование чисел для удобного отображения
+  const { t } = useLanguage();
+  
+  // Formatting numbers for display
   const formatPrice = (price: number) => {
     if (price < 0.01) return price.toFixed(8);
     if (price < 1) return price.toFixed(4);
@@ -32,21 +35,21 @@ const CharacterDetails = ({ character }: CharacterDetailsProps) => {
             <span style={{ color: character.color }}>{character.name}</span>
             <Badge variant="outline" className="text-xs">{character.symbol}</Badge>
           </CardTitle>
-          <Badge variant="secondary" className="text-sm font-semibold">Ранг: #{character.rank}</Badge>
+          <Badge variant="secondary" className="text-sm font-semibold">Rank: #{character.rank}</Badge>
         </div>
         <CardDescription className="mt-2">{character.description}</CardDescription>
       </CardHeader>
       <CardContent className="pt-4 space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col space-y-1">
-            <span className="text-sm text-muted-foreground">Цена</span>
+            <span className="text-sm text-muted-foreground">Price</span>
             <div className="flex items-center gap-1 text-xl font-semibold">
               <DollarSign className="h-5 w-5" style={{ color: character.color }} />
               <span>{formatPrice(character.price)}</span>
             </div>
           </div>
           <div className="flex flex-col space-y-1">
-            <span className="text-sm text-muted-foreground">Рыночная капитализация</span>
+            <span className="text-sm text-muted-foreground">Market Cap</span>
             <div className="flex items-center gap-1 text-xl font-semibold">
               <Coins className="h-5 w-5" style={{ color: character.color }} />
               <span>{formatMarketCap(character.marketCap)}</span>
@@ -75,12 +78,12 @@ const CharacterDetails = ({ character }: CharacterDetailsProps) => {
         </div>
         
         <div className="bg-secondary/50 p-4 rounded-xl">
-          <h3 className="font-semibold mb-3">Характеристики</h3>
+          <h3 className="font-semibold mb-3">Stats</h3>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <div>
                 <div className="flex justify-between text-sm">
-                  <span>Сила</span>
+                  <span>Strength</span>
                   <span className="font-medium">{character.stats.strength}</span>
                 </div>
                 <div className="h-2 rounded-full bg-muted overflow-hidden">
@@ -95,7 +98,7 @@ const CharacterDetails = ({ character }: CharacterDetailsProps) => {
               </div>
               <div>
                 <div className="flex justify-between text-sm">
-                  <span>Скорость</span>
+                  <span>Speed</span>
                   <span className="font-medium">{character.stats.speed}</span>
                 </div>
                 <div className="h-2 rounded-full bg-muted overflow-hidden">
@@ -112,7 +115,7 @@ const CharacterDetails = ({ character }: CharacterDetailsProps) => {
             <div className="space-y-2">
               <div>
                 <div className="flex justify-between text-sm">
-                  <span>Интеллект</span>
+                  <span>Intelligence</span>
                   <span className="font-medium">{character.stats.intelligence}</span>
                 </div>
                 <div className="h-2 rounded-full bg-muted overflow-hidden">
@@ -127,7 +130,7 @@ const CharacterDetails = ({ character }: CharacterDetailsProps) => {
               </div>
               <div>
                 <div className="flex justify-between text-sm">
-                  <span>Харизма</span>
+                  <span>Charisma</span>
                   <span className="font-medium">{character.stats.charisma}</span>
                 </div>
                 <div className="h-2 rounded-full bg-muted overflow-hidden">

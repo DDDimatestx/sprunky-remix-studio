@@ -10,40 +10,40 @@ const CharactersTab = () => {
       
       <div className="space-y-4">
         <p>
-          Чтобы добавить новых персонажей, нужно отредактировать файл <code>src/data/characters.ts</code>. 
-          Каждый персонаж имеет следующие свойства:
+          To add new characters, you need to edit the <code>src/data/characters.ts</code> file. 
+          Each character has the following properties:
         </p>
         
         <div className="bg-slate-900 text-white p-4 rounded-md overflow-x-auto">
           <pre>{`interface CryptoCharacter {
-  id: string;          // Уникальный идентификатор (например, "bitcoin")
-  name: string;        // Отображаемое имя персонажа
-  symbol: string;      // Символ криптовалюты (например, "BTC")
-  rank: number;        // Ранг в рейтинге криптовалют
-  price: number;       // Цена в USD
-  marketCap: number;   // Рыночная капитализация в USD
-  image: string;       // URL к изображению (можно добавить в public/images)
-  color: string;       // Основной цвет (в формате HEX, например "#F7931A")
-  description: string; // Краткое описание персонажа
+  id: string;          // Unique identifier (e.g., "bitcoin")
+  name: string;        // Display name of the character
+  symbol: string;      // Cryptocurrency symbol (e.g., "BTC")
+  rank: number;        // Rank in cryptocurrency market
+  price: number;       // Price in USD
+  marketCap: number;   // Market capitalization in USD
+  image: string;       // URL to an image (can be added in public/images)
+  color: string;       // Primary color (HEX format, e.g. "#F7931A")
+  description: string; // Short description of the character
   stats: {
-    strength: number;     // Показатель силы (1-100)
-    speed: number;        // Показатель скорости (1-100)
-    intelligence: number; // Показатель интеллекта (1-100)
-    charisma: number;     // Показатель харизмы (1-100)
+    strength: number;     // Strength indicator (1-100)
+    speed: number;        // Speed indicator (1-100)
+    intelligence: number; // Intelligence indicator (1-100)
+    charisma: number;     // Charisma indicator (1-100)
   };
-  statsDescriptions?: {   // Описания показателей (опционально)
-    strength: string;     // Описание силы
-    speed: string;        // Описание скорости
-    intelligence: string; // Описание интеллекта
-    charisma: string;     // Описание харизмы
+  statsDescriptions?: {   // Stats descriptions (optional)
+    strength: string;     // Strength description
+    speed: string;        // Speed description
+    intelligence: string; // Intelligence description
+    charisma: string;     // Charisma description
   };
 }`}</pre>
         </div>
         
-        <p>Пример добавления нового персонажа:</p>
+        <p>Example of adding a new character:</p>
         
         <div className="bg-slate-900 text-white p-4 rounded-md overflow-x-auto">
-          <pre>{`// В файле src/data/characters.ts добавьте новый объект в массив cryptoCharacters:
+          <pre>{`// In the file src/data/characters.ts add a new object to the cryptoCharacters array:
 
 export const cryptoCharacters: CryptoCharacter[] = [
   // ... существующие персонажи
@@ -54,9 +54,9 @@ export const cryptoCharacters: CryptoCharacter[] = [
     rank: 11,
     price: 34.25,
     marketCap: 12500000000,
-    image: "/images/avalanche.png", // Добавьте изображение в public/images
+    image: "/images/avalanche.png", // Add this image to public/images
     color: "#E84142",
-    description: "Быстрая, низкозатратная и экологичная платформа для dApps и систем с несколькими блокчейнами.",
+    description: "Fast, low-cost, and eco-friendly platform for dApps and multi-blockchain systems.",
     stats: {
       strength: 76,
       speed: 92,
@@ -64,10 +64,10 @@ export const cryptoCharacters: CryptoCharacter[] = [
       charisma: 71
     },
     statsDescriptions: {
-      strength: "Высокая рыночная капитализация и стабильность",
-      speed: "Одна из самых быстрых сетей с высокой пропускной способностью",
-      intelligence: "Продвинутая технология консенсуса и смарт-контрактов",
-      charisma: "Растущее сообщество разработчиков и пользователей"
+      strength: "High market capitalization and stability",
+      speed: "One of the fastest networks with high throughput",
+      intelligence: "Advanced consensus technology and smart contracts",
+      charisma: "Growing community of developers and users"
     }
   }
 ];`}</pre>

@@ -50,7 +50,7 @@ const CharacterCard = ({ character, isSelected, onClick }: CharacterCardProps) =
           <div className="space-y-3 mt-2">
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
-                <span>Сила</span>
+                <span>Strength</span>
                 <span>{character.stats.strength}</span>
               </div>
               <Progress value={character.stats.strength} 
@@ -63,7 +63,7 @@ const CharacterCard = ({ character, isSelected, onClick }: CharacterCardProps) =
             </div>
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
-                <span>Скорость</span>
+                <span>Speed</span>
                 <span>{character.stats.speed}</span>
               </div>
               <Progress value={character.stats.speed} 
@@ -76,7 +76,7 @@ const CharacterCard = ({ character, isSelected, onClick }: CharacterCardProps) =
             </div>
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
-                <span>Интеллект</span>
+                <span>Intelligence</span>
                 <span>{character.stats.intelligence}</span>
               </div>
               <Progress value={character.stats.intelligence} 
@@ -89,7 +89,7 @@ const CharacterCard = ({ character, isSelected, onClick }: CharacterCardProps) =
             </div>
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
-                <span>Харизма</span>
+                <span>Charisma</span>
                 <span>{character.stats.charisma}</span>
               </div>
               <Progress value={character.stats.charisma} 
