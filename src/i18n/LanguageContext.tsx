@@ -1,3 +1,4 @@
+
 import React, {
   createContext,
   useState,
@@ -5,7 +6,7 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { enTranslations } from './locales/en';
 import { ruTranslations } from './locales/ru';
 import { zhTranslations } from './locales/zh';
@@ -52,13 +53,17 @@ interface LanguageProviderProps {
 export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const params = useParams();
 
-  const urlLang = location.pathname.split('/')[1] as LanguageCode;
-  const isValidLang = Object.keys(translations).includes(urlLang);
+  // Получаем язык из URL-параметра или из localStorage
+  const urlLang = params.lang as LanguageCode;
+  const storedLang = localStorage.getItem('language') as LanguageCode | null;
+  const isValidLang = urlLang && Object.keys(translations).includes(urlLang);
 
-  const [language, setLanguageState] = useState<LanguageCode>(
-    isValidLang ? urlLang : 'en'
-  );
+  // Приоритет: URL параметр > localStorage > 'en' (по умолчанию)
+  const initialLang = isValidLang ? urlLang : (storedLang || 'en');
+
+  const [language, setLanguageState] = useState<LanguageCode>(initialLang);
 
   // При изменении URL — обновляем язык
   useEffect(() => {
@@ -66,7 +71,7 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
       setLanguageState(urlLang);
       localStorage.setItem('language', urlLang);
     }
-  }, [urlLang]);
+  }, [urlLang, isValidLang]);
 
   const setLanguage = (lang: LanguageCode) => {
     localStorage.setItem('language', lang);
@@ -74,9 +79,16 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
 
     // Перенаправляем пользователя на новую локаль в URL
     const pathParts = location.pathname.split('/');
-    pathParts[1] = lang;
-    const newPath = pathParts.join('/') || '/';
-    navigate(newPath, { replace: true });
+    
+    if (pathParts.length > 1) {
+      // Первый элемент после "/" - это код языка
+      pathParts[1] = lang;
+      const newPath = pathParts.join('/');
+      navigate(newPath, { replace: true });
+    } else {
+      // Если путь короткий (например, "/"), просто добавляем язык
+      navigate(`/${lang}`, { replace: true });
+    }
   };
 
   useEffect(() => {
@@ -91,6 +103,7 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
       if (value && value[part] !== undefined) {
         value = value[part];
       } else {
+        console.warn(`Translation key not found: ${key}`);
         return key;
       }
     }
@@ -101,7 +114,7 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
       }, value);
     }
 
-    return value;
+    return typeof value === 'string' ? value : key;
   };
 
   const allLanguages = Object.keys(translations) as LanguageCode[];

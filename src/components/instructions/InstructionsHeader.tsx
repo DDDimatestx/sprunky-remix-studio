@@ -1,33 +1,29 @@
 
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, BookOpen } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useLanguage } from "@/i18n/LanguageContext";
-import LanguageSelector from "@/components/LanguageSelector";
+import { useLanguage } from '@/i18n/LanguageContext';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 
 export const InstructionsHeader = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   return (
-    <header className="w-full py-6 border-b border-game-primary/20">
-      <div className="container flex items-center justify-between">
-        <Button 
-          variant="outline" 
-          className="flex items-center gap-2"
-          onClick={() => navigate("/")}
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {t('common.back')}
-        </Button>
-        <h1 className="text-3xl md:text-4xl font-bold text-center flex items-center gap-3">
-          <BookOpen className="h-8 w-8 text-game-primary" />
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-game-primary to-game-secondary">
-            {t('instructions.title')}
-          </span>
-        </h1>
-        <LanguageSelector />
+    <div className="w-full bg-gradient-to-r from-game-primary to-game-secondary py-8">
+      <div className="container">
+        <div className="flex flex-col items-center">
+          <Button
+            variant="ghost"
+            className="self-start mb-4 text-white hover:bg-white/20 hover:text-white"
+            onClick={() => navigate(`/${language}`)}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {t('common.back')}
+          </Button>
+          
+          <h1 className="text-3xl font-bold text-white mb-2">{t('instructions.title')}</h1>
+        </div>
       </div>
-    </header>
+    </div>
   );
 };

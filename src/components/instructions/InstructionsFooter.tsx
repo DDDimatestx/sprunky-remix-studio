@@ -1,14 +1,17 @@
 
-import { useLanguage } from "@/i18n/LanguageContext";
+import { useLanguage } from '@/i18n/LanguageContext';
 
 export const InstructionsFooter = () => {
   const { t } = useLanguage();
   
   return (
-    <footer className="py-4 border-t border-game-primary/20">
-      <div className="container text-center text-sm text-muted-foreground">
-        {t('common.copyright', { year: new Date().getFullYear() })}
+    <div className="container my-8">
+      <div className="bg-white/50 backdrop-blur-sm rounded-lg border p-6">
+        <h3 className="text-xl font-semibold mb-4">CryptoHeroes</h3>
+        <p className="text-muted-foreground">
+          {t('common.copyright', { year: new Date().getFullYear() })}
+        </p>
       </div>
-    </footer>
+    </div>
   );
 };

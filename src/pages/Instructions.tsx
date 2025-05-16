@@ -6,6 +6,7 @@ import { InstructionsFooter } from "@/components/instructions/InstructionsFooter
 import { GameRulesTab } from "@/components/instructions/GameRulesTab";
 import { GameModesTab } from "@/components/instructions/GameModesTab";
 import { CharactersInfoTab } from "@/components/instructions/CharactersInfoTab";
+import PageLayout from "@/components/layouts/PageLayout";
 
 const Instructions = () => {
   const { t } = useLanguage();
