@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { cryptoCharacters } from "../data/characters";
@@ -11,6 +10,8 @@ import BattleArena from "@/components/BattleArena";
 import { getRandomCharacter } from "@/lib/game-utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import PageLayout from "@/components/layouts/PageLayout";
+import CharacterSearch from "@/components/CharacterSearch";
+import CharacterSelector from "@/components/CharacterSelector";
 
 const BattleVsComputer = () => {
   const navigate = useNavigate();
@@ -25,6 +26,10 @@ const BattleVsComputer = () => {
     winner: null,
     score: { player: 0, computer: 0 }
   });
+  
+  // New state for character selection
+  const [allCharacters, setAllCharacters] = useState<CryptoCharacter[]>(cryptoCharacters);
+  const [filteredCharacters, setFilteredCharacters] = useState<CryptoCharacter[]>(cryptoCharacters);
   
   // Automatically select computer character when player chooses
   useEffect(() => {
@@ -55,6 +60,16 @@ const BattleVsComputer = () => {
       description: `You chose ${character.symbol} to battle against the computer`,
       duration: 2000,
     });
+  };
+  
+  const handleSearch = (searchTerm: string) => {
+    const term = searchTerm.toLowerCase();
+    const filtered = allCharacters.filter(
+      character => 
+        character.name.toLowerCase().includes(term) ||
+        character.symbol.toLowerCase().includes(term)
+    );
+    setFilteredCharacters(filtered);
   };
 
   const startBattle = () => {
@@ -209,22 +224,23 @@ const BattleVsComputer = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-8">
-                {cryptoCharacters.map((character) => (
-                  <CharacterBattleCard
-                    key={character.id}
-                    character={character}
-                    isSelected={playerCharacter?.id === character.id || computerCharacter?.id === character.id}
-                    onClick={() => {
-                      if (playerCharacter?.id === character.id || computerCharacter?.id === character.id) {
-                        return; // Already selected
-                      }
-                      
-                      handleSelectCharacter(character);
-                    }}
-                  />
-                ))}
-              </div>
+              {/* Add search component */}
+              <CharacterSearch onSearch={handleSearch} />
+              
+              <h2 className="text-xl md:text-2xl font-bold text-center">
+                Select Character ({filteredCharacters.length} available)
+              </h2>
+              <CharacterSelector
+                characters={filteredCharacters}
+                selectedCharacter={playerCharacter || computerCharacter}
+                onSelectCharacter={(character) => {
+                  if (playerCharacter?.id === character.id || computerCharacter?.id === character.id) {
+                    return; // Already selected
+                  }
+                  
+                  handleSelectCharacter(character);
+                }}
+              />
             </div>
           )}
           

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { cryptoCharacters } from "../data/characters";
@@ -10,6 +9,8 @@ import CharacterBattleCard from "@/components/CharacterBattleCard";
 import BattleArena from "@/components/BattleArena";
 import { useLanguage } from "@/i18n/LanguageContext";
 import PageLayout from "@/components/layouts/PageLayout";
+import CharacterSearch from "@/components/CharacterSearch";
+import CharacterSelector from "@/components/CharacterSelector";
 
 const Battle = () => {
   const navigate = useNavigate();
@@ -22,6 +23,10 @@ const Battle = () => {
     winner: null,
     score: { player: 0, opponent: 0 }
   });
+  
+  // New state for character selection
+  const [allCharacters, setAllCharacters] = useState<CryptoCharacter[]>(cryptoCharacters);
+  const [filteredCharacters, setFilteredCharacters] = useState<CryptoCharacter[]>(cryptoCharacters);
   
   // Reset selection on page init
   useEffect(() => {
@@ -53,6 +58,16 @@ const Battle = () => {
     }
   };
 
+  const handleSearch = (searchTerm: string) => {
+    const term = searchTerm.toLowerCase();
+    const filtered = allCharacters.filter(
+      character => 
+        character.name.toLowerCase().includes(term) ||
+        character.symbol.toLowerCase().includes(term)
+    );
+    setFilteredCharacters(filtered);
+  };
+  
   const startBattle = () => {
     if (!playerCharacter || !opponentCharacter) return;
     
@@ -183,26 +198,27 @@ const Battle = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-8">
-                {cryptoCharacters.map((character) => (
-                  <CharacterBattleCard
-                    key={character.id}
-                    character={character}
-                    isSelected={playerCharacter?.id === character.id || opponentCharacter?.id === character.id}
-                    onClick={() => {
-                      if (playerCharacter?.id === character.id || opponentCharacter?.id === character.id) {
-                        return; // Already selected
-                      }
-                      
-                      if (!playerCharacter) {
-                        handleSelectCharacter(character, true);
-                      } else if (!opponentCharacter) {
-                        handleSelectCharacter(character, false);
-                      }
-                    }}
-                  />
-                ))}
-              </div>
+              {/* Add search component */}
+              <CharacterSearch onSearch={handleSearch} />
+              
+              <h2 className="text-xl md:text-2xl font-bold text-center">
+                Select Character ({filteredCharacters.length} available)
+              </h2>
+              <CharacterSelector
+                characters={filteredCharacters}
+                selectedCharacter={playerCharacter || opponentCharacter}
+                onSelectCharacter={(character) => {
+                  if (playerCharacter?.id === character.id || opponentCharacter?.id === character.id) {
+                    return; // Already selected
+                  }
+                  
+                  if (!playerCharacter) {
+                    handleSelectCharacter(character, true);
+                  } else if (!opponentCharacter) {
+                    handleSelectCharacter(character, false);
+                  }
+                }}
+              />
             </div>
           )}
           
