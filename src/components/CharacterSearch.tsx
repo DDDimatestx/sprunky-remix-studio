@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Input } from "./ui/input";
-import { Search } from "lucide-react";
+import { Search, SortAsc } from "lucide-react";
 import { 
   Select,
   SelectContent,
@@ -43,6 +43,7 @@ const CharacterSearch = ({
           value={searchTerm}
           onChange={handleSearch}
           className="pl-9 w-full"
+          autoComplete="off"
         />
       </div>
       

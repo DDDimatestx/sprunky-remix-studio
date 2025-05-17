@@ -1,6 +1,6 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { cryptoCharacters } from "../data/characters";
 import { CryptoCharacter } from "../types/character";
 import { Button } from "@/components/ui/button";
 import { Gamepad, Trophy, Cpu, ArrowLeft } from "lucide-react";
@@ -12,6 +12,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import PageLayout from "@/components/layouts/PageLayout";
 import CharacterSearch from "@/components/CharacterSearch";
 import CharacterSelector from "@/components/CharacterSelector";
+import { getCachedCoins } from "@/services/coingeckoService";
 
 const BattleVsComputer = () => {
   const navigate = useNavigate();
@@ -27,17 +28,41 @@ const BattleVsComputer = () => {
     score: { player: 0, computer: 0 }
   });
   
-  // New state for character selection
-  const [allCharacters, setAllCharacters] = useState<CryptoCharacter[]>(cryptoCharacters);
-  const [filteredCharacters, setFilteredCharacters] = useState<CryptoCharacter[]>(cryptoCharacters);
+  // State for character selection
+  const [allCharacters, setAllCharacters] = useState<CryptoCharacter[]>([]);
+  const [filteredCharacters, setFilteredCharacters] = useState<CryptoCharacter[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Load all characters from CoinGecko on init
+  useEffect(() => {
+    const loadCharacters = async () => {
+      try {
+        setIsLoading(true);
+        const characters = await getCachedCoins();
+        setAllCharacters(characters);
+        setFilteredCharacters(characters);
+      } catch (error) {
+        console.error("Error loading characters:", error);
+        toast({
+          title: "Error loading characters",
+          description: "Could not load cryptocurrency data. Please try refreshing the page.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadCharacters();
+  }, []);
   
   // Automatically select computer character when player chooses
   useEffect(() => {
-    if (playerCharacter && battleStatus === "selecting") {
+    if (playerCharacter && battleStatus === "selecting" && allCharacters.length > 0) {
       // Small delay for "thinking" effect
       const timer = setTimeout(() => {
         // Choose random character different from player
-        const randomCharacter = getRandomCharacter(cryptoCharacters, playerCharacter.id);
+        const randomCharacter = getRandomCharacter(allCharacters, playerCharacter.id);
         setComputerCharacter(randomCharacter);
         
         toast({
@@ -50,7 +75,7 @@ const BattleVsComputer = () => {
       
       return () => clearTimeout(timer);
     }
-  }, [playerCharacter, battleStatus]);
+  }, [playerCharacter, battleStatus, allCharacters]);
 
   const handleSelectCharacter = (character: CryptoCharacter) => {
     setPlayerCharacter(character);
@@ -179,7 +204,16 @@ const BattleVsComputer = () => {
         </h1>
 
         <div className="flex flex-col items-center justify-center space-y-8">
-          {battleStatus === "selecting" && (
+          {isLoading ? (
+            <div className="w-full text-center p-8">
+              <div className="animate-pulse flex flex-col items-center">
+                <div className="h-12 w-12 mb-4 rounded-full bg-muted"></div>
+                <div className="h-4 w-48 bg-muted rounded"></div>
+                <div className="mt-2 h-3 w-32 bg-muted rounded"></div>
+              </div>
+              <p className="mt-4 text-muted-foreground">Loading cryptocurrency data...</p>
+            </div>
+          ) : battleStatus === "selecting" && (
             <div className="w-full max-w-3xl text-center space-y-6">
               <h2 className="text-xl md:text-2xl font-bold">Select Your Character</h2>
               
@@ -224,7 +258,7 @@ const BattleVsComputer = () => {
                 </div>
               </div>
               
-              {/* Add search component */}
+              {/* Search component */}
               <CharacterSearch onSearch={handleSearch} />
               
               <h2 className="text-xl md:text-2xl font-bold text-center">
