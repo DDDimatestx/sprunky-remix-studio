@@ -1,25 +1,82 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { cryptoCharacters } from "../data/characters";
 import CharacterSelector from "../components/CharacterSelector";
 import CharacterDetails from "../components/CharacterDetails";
+import CharacterSearch from "../components/CharacterSearch";
 import { CryptoCharacter } from "../types/character";
 import { Coins, Gamepad, Trophy, BookOpen } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import PageLayout from "@/components/layouts/PageLayout";
+import { getCachedCoins } from "../services/coingeckoService";
 
 const Index = () => {
   const navigate = useNavigate();
   const { language, t } = useLanguage();
   
+  const [allCharacters, setAllCharacters] = useState<CryptoCharacter[]>(cryptoCharacters);
+  const [filteredCharacters, setFilteredCharacters] = useState<CryptoCharacter[]>(cryptoCharacters);
   const [selectedCharacter, setSelectedCharacter] = useState<CryptoCharacter | null>(
     cryptoCharacters[0] || null
   );
+  const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+
+  // Load data from CoinGecko or cache
+  useEffect(() => {
+    const loadCryptoData = async () => {
+      setIsLoading(true);
+      try {
+        const coinsData = await getCachedCoins();
+        
+        if (coinsData && coinsData.length > 0) {
+          setAllCharacters(coinsData);
+          setFilteredCharacters(coinsData);
+          setSelectedCharacter(coinsData[0]);
+          
+          if (coinsData[0]?.lastUpdated) {
+            setLastUpdated(coinsData[0].lastUpdated);
+          }
+          
+          toast({
+            title: "Data updated",
+            description: `Loaded ${coinsData.length} cryptocurrencies`,
+            duration: 3000,
+          });
+        } else {
+          // Fallback to static data
+          setAllCharacters(cryptoCharacters);
+          setFilteredCharacters(cryptoCharacters);
+          setSelectedCharacter(cryptoCharacters[0]);
+          
+          toast({
+            title: "Using backup data",
+            description: "Could not fetch current cryptocurrency data",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error loading crypto data:", error);
+        toast({
+          title: "Data loading error",
+          description: "Using backup cryptocurrency data",
+          variant: "destructive",
+        });
+        
+        setAllCharacters(cryptoCharacters);
+        setFilteredCharacters(cryptoCharacters);
+        setSelectedCharacter(cryptoCharacters[0]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadCryptoData();
+  }, []);
 
   // Check auth status
   useEffect(() => {
@@ -43,6 +100,23 @@ const Index = () => {
       description: t('home.characterSelectedDesc', { symbol: character.symbol, rank: character.rank }),
       duration: 3000,
     });
+  };
+
+  const handleSearch = (searchTerm: string) => {
+    const term = searchTerm.toLowerCase();
+    const filtered = allCharacters.filter(
+      character => 
+        character.name.toLowerCase().includes(term) ||
+        character.symbol.toLowerCase().includes(term)
+    );
+    setFilteredCharacters(filtered);
+    
+    // Reset selection if no match found or select first result
+    if (filtered.length === 0) {
+      // Keep the current selection
+    } else if (!filtered.find(c => c.id === selectedCharacter?.id)) {
+      setSelectedCharacter(filtered[0]);
+    }
   };
 
   const handleLogout = () => {
@@ -118,26 +192,50 @@ const Index = () => {
                 </Button>
               </div>
               
-              {selectedCharacter ? (
-                <>
-                  <div className="w-full max-w-3xl">
-                    <h2 className="text-xl md:text-2xl font-bold mb-6 text-center">Character Details</h2>
-                    <CharacterDetails character={selectedCharacter} />
-                  </div>
-                  
-                  <div className="w-full pt-4">
-                    <h2 className="text-xl md:text-2xl font-bold mb-6 text-center">Select Character</h2>
-                    <CharacterSelector
-                      characters={cryptoCharacters}
-                      selectedCharacter={selectedCharacter}
-                      onSelectCharacter={handleSelectCharacter}
-                    />
-                  </div>
-                </>
-              ) : (
+              {/* Search component */}
+              <CharacterSearch onSearch={handleSearch} />
+              
+              {isLoading ? (
                 <div className="flex items-center justify-center h-64 text-center">
-                  <p>Loading...</p>
+                  <p>Loading cryptocurrencies...</p>
                 </div>
+              ) : filteredCharacters.length === 0 ? (
+                <div className="flex items-center justify-center h-64 text-center">
+                  <p>No cryptocurrencies found matching your search.</p>
+                </div>
+              ) : (
+                <>
+                  {selectedCharacter ? (
+                    <>
+                      <div className="w-full max-w-3xl">
+                        <div className="flex justify-between items-center mb-6">
+                          <h2 className="text-xl md:text-2xl font-bold text-center">Character Details</h2>
+                          {lastUpdated && (
+                            <p className="text-xs text-muted-foreground">
+                              Last updated: {new Date(lastUpdated).toLocaleString()}
+                            </p>
+                          )}
+                        </div>
+                        <CharacterDetails character={selectedCharacter} />
+                      </div>
+                      
+                      <div className="w-full pt-4">
+                        <h2 className="text-xl md:text-2xl font-bold mb-6 text-center">
+                          Select Character ({filteredCharacters.length} available)
+                        </h2>
+                        <CharacterSelector
+                          characters={filteredCharacters}
+                          selectedCharacter={selectedCharacter}
+                          onSelectCharacter={handleSelectCharacter}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-center h-64 text-center">
+                      <p>No character selected. Please select a cryptocurrency.</p>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -151,19 +249,19 @@ const Index = () => {
               </h2>
               <div className="space-y-4">
                 <div className="border-b pb-3">
-                  <p className="font-semibold">Game Update 2.0</p>
-                  <p className="text-sm text-muted-foreground">May 10, 2025</p>
-                  <p className="mt-2 text-sm">New characters added! 10 new cryptocurrencies join the battle.</p>
+                  <p className="font-semibold">Data Update System Added</p>
+                  <p className="text-sm text-muted-foreground">May 17, 2025</p>
+                  <p className="mt-2 text-sm">We now fetch real-time cryptocurrency data from CoinGecko API, updating every 6 hours!</p>
                 </div>
                 <div className="border-b pb-3">
-                  <p className="font-semibold">Weekend Tournament</p>
-                  <p className="text-sm text-muted-foreground">May 5, 2025</p>
-                  <p className="mt-2 text-sm">Join our weekend tournament and win exclusive prizes!</p>
+                  <p className="font-semibold">Top 100 Coins Available</p>
+                  <p className="text-sm text-muted-foreground">May 15, 2025</p>
+                  <p className="mt-2 text-sm">CryptoHeroes now features the top 100 cryptocurrencies by market cap.</p>
                 </div>
                 <div>
-                  <p className="font-semibold">Community Challenge</p>
-                  <p className="text-sm text-muted-foreground">May 1, 2025</p>
-                  <p className="mt-2 text-sm">Reach 10,000 battles collectively to unlock special characters.</p>
+                  <p className="font-semibold">Search Functionality</p>
+                  <p className="text-sm text-muted-foreground">May 10, 2025</p>
+                  <p className="mt-2 text-sm">Find your favorite cryptocurrencies quickly with our new search feature!</p>
                 </div>
               </div>
             </div>

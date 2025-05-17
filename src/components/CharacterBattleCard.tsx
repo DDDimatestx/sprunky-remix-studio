@@ -3,6 +3,7 @@ import { CryptoCharacter } from "../types/character";
 import { Coins, X } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 interface CharacterBattleCardProps {
   character: CryptoCharacter;
@@ -23,6 +24,8 @@ const CharacterBattleCard = ({
   showStats = false,
   highlighted = false
 }: CharacterBattleCardProps) => {
+  const [imageError, setImageError] = useState(false);
+  
   return (
     <div 
       onClick={onClick}
@@ -56,13 +59,18 @@ const CharacterBattleCard = ({
       )}>
         <div 
           className={cn(
-            "shrink-0 rounded-full flex items-center justify-center border-2 overflow-hidden",
+            "shrink-0 rounded-full flex items-center justify-center border-2 overflow-hidden bg-white",
             large ? "h-16 w-16" : "h-12 w-12"
           )}
           style={{ borderColor: character.color }}
         >
-          {character.image ? (
-            <img src={character.image} alt={character.name} />
+          {character.image && !imageError ? (
+            <img 
+              src={character.image} 
+              alt={character.name}
+              className="w-full h-full object-contain"
+              onError={() => setImageError(true)} 
+            />
           ) : (
             <Coins style={{ color: character.color }} className={cn(large ? "h-9 w-9" : "h-7 w-7")} />
           )}
@@ -91,7 +99,7 @@ const CharacterBattleCard = ({
         <div className="p-3 pt-0 space-y-2">
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
-              <span>Сила</span>
+              <span>Strength</span>
               <span>{character.stats.strength}</span>
             </div>
             <Progress value={character.stats.strength} 
@@ -104,7 +112,7 @@ const CharacterBattleCard = ({
           </div>
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
-              <span>Скорость</span>
+              <span>Speed</span>
               <span>{character.stats.speed}</span>
             </div>
             <Progress value={character.stats.speed} 
@@ -117,7 +125,7 @@ const CharacterBattleCard = ({
           </div>
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
-              <span>Интеллект</span>
+              <span>Intelligence</span>
               <span>{character.stats.intelligence}</span>
             </div>
             <Progress value={character.stats.intelligence} 
@@ -130,7 +138,7 @@ const CharacterBattleCard = ({
           </div>
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
-              <span>Харизма</span>
+              <span>Charisma</span>
               <span>{character.stats.charisma}</span>
             </div>
             <Progress value={character.stats.charisma} 

@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { CryptoCharacter } from "../types/character";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Avatar } from "./ui/avatar";
@@ -12,6 +13,8 @@ interface CharacterCardProps {
 }
 
 const CharacterCard = ({ character, isSelected, onClick }: CharacterCardProps) => {
+  const [imageError, setImageError] = useState(false);
+  
   return (
     <div 
       onClick={onClick}
@@ -21,28 +24,34 @@ const CharacterCard = ({ character, isSelected, onClick }: CharacterCardProps) =
     >
       <Card 
         className={`relative overflow-hidden border-2 ${
-          isSelected ? `border-[${character.color}]` : "border-transparent"
+          isSelected ? "border-[${character.color}]" : "border-transparent"
         }`}
         style={{ 
           background: `linear-gradient(135deg, ${character.color}15 0%, ${character.color}30 100%)`,
+          borderColor: isSelected ? character.color : "transparent"
         }}
       >
         <div 
-          className="absolute top-0 right-0 p-2 rounded-bl-lg font-bold"
+          className="absolute top-0 right-0 p-2 rounded-bl-lg font-bold text-white"
           style={{ backgroundColor: `${character.color}` }}
         >
           #{character.rank}
         </div>
         <CardHeader className="pb-2 pt-6 flex flex-row items-center gap-3">
-          <Avatar className="h-12 w-12 border-2" style={{ borderColor: character.color }}>
-            {character.image ? (
-              <img src={character.image} alt={character.name} />
+          <Avatar className="h-12 w-12 border-2 bg-white" style={{ borderColor: character.color }}>
+            {character.image && !imageError ? (
+              <img 
+                src={character.image} 
+                alt={character.name} 
+                onError={() => setImageError(true)}
+                className="object-contain"
+              />
             ) : (
               <Coins className="h-8 w-8" style={{ color: character.color }} />
             )}
           </Avatar>
           <div className="flex flex-col">
-            <h3 className="font-bold text-lg">{character.name}</h3>
+            <h3 className="font-bold text-lg truncate max-w-[150px]">{character.name}</h3>
             <p className="text-xs text-muted-foreground">{character.symbol}</p>
           </div>
         </CardHeader>

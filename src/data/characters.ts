@@ -1,6 +1,7 @@
 
 import { CryptoCharacter } from "../types/character";
 
+// This file now serves as a fallback in case API calls fail
 export const cryptoCharacters: CryptoCharacter[] = [
   {
     id: "bitcoin",

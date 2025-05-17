@@ -14,7 +14,9 @@ const CharacterDetails = ({ character }: CharacterDetailsProps) => {
   
   // Formatting numbers for display
   const formatPrice = (price: number) => {
-    if (price < 0.01) return price.toFixed(8);
+    if (price < 0.00001) return price.toFixed(10);
+    if (price < 0.0001) return price.toFixed(8);
+    if (price < 0.01) return price.toFixed(6);
     if (price < 1) return price.toFixed(4);
     if (price < 10) return price.toFixed(2);
     return price.toFixed(2);
@@ -27,6 +29,12 @@ const CharacterDetails = ({ character }: CharacterDetailsProps) => {
     return `$${marketCap.toLocaleString()}`;
   };
 
+  const truncateDescription = (desc: string, maxLength: number = 300) => {
+    if (!desc) return "No description available.";
+    if (desc.length <= maxLength) return desc;
+    return `${desc.substring(0, maxLength)}...`;
+  };
+
   return (
     <Card className="w-full h-full animate-fade-in">
       <CardHeader className="pb-3" style={{ borderBottom: `2px solid ${character.color}20` }}>
@@ -37,7 +45,7 @@ const CharacterDetails = ({ character }: CharacterDetailsProps) => {
           </CardTitle>
           <Badge variant="secondary" className="text-sm font-semibold">Rank: #{character.rank}</Badge>
         </div>
-        <CardDescription className="mt-2">{character.description}</CardDescription>
+        <CardDescription className="mt-2">{truncateDescription(character.description)}</CardDescription>
       </CardHeader>
       <CardContent className="pt-4 space-y-6">
         <div className="grid grid-cols-2 gap-4">
@@ -68,6 +76,10 @@ const CharacterDetails = ({ character }: CharacterDetailsProps) => {
               src={character.image} 
               alt={character.name} 
               className="h-32 animate-bounce-small"
+              onError={(e) => {
+                // Fallback to placeholder on image error
+                (e.target as HTMLImageElement).src = "/placeholder.svg";
+              }}
             />
           ) : (
             <Coins 

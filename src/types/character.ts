@@ -21,4 +21,5 @@ export interface CryptoCharacter {
     intelligence: string;
     charisma: string;
   };
+  lastUpdated?: string;
 }
