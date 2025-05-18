@@ -1,4 +1,3 @@
-
 import { CryptoCharacter } from "../types/character";
 
 /**
@@ -17,24 +16,45 @@ export const getRandomCharacter = (characters: CryptoCharacter[], excludeId?: st
  * Расчет боевой эффективности на основе характеристик
  */
 export const calculateBattleScore = (character: CryptoCharacter): number => {
-  // Случайный фактор для непредсказуемости (от 0.8 до 1.2)
-  const randomFactor = 0.8 + Math.random() * 0.4;
+  // Random factor with reduced range for more predictable outcomes (0.9 to 1.1)
+  const randomFactor = 0.9 + Math.random() * 0.2;
   
-  // Бонус за ранг (чем ниже ранг, тем выше бонус)
-  const rankBonus = Math.max(0, 11 - character.rank) * 2;
+  // Rank bonus based on market cap rank - gives significant advantage to higher ranked coins
+  const rankBonusMap: {[key: number]: number} = {
+    1: 30, // Bitcoin gets huge bonus
+    2: 25, // Ethereum gets large bonus
+    3: 20, // Top 3
+    5: 18, // Top 5
+    10: 15, // Top 10
+    20: 12, // Top 20
+    50: 8, // Top 50
+    100: 5, // Top 100
+  };
   
-  // Основной счет на основе характеристик
+  let rankBonus = 0;
+  for (const [rankThreshold, bonus] of Object.entries(rankBonusMap)) {
+    if (character.rank <= parseInt(rankThreshold)) {
+      rankBonus = bonus;
+      break;
+    }
+  }
+  
+  // Base score from character stats - weighted more strategically
   const baseScore = (
-    character.stats.strength * 1.2 +
-    character.stats.speed * 0.8 +
-    character.stats.intelligence * 1.0 +
-    character.stats.charisma * 0.5
+    character.stats.strength * 1.5 + // Strength is most important
+    character.stats.speed * 0.7 + // Speed is less critical
+    character.stats.intelligence * 1.0 + // Intelligence matters moderately
+    character.stats.charisma * 0.4 // Charisma matters least in battle
   );
   
-  // Бонус за рыночную капитализацию (логарифмический масштаб)
-  const marketCapBonus = Math.log10(character.marketCap / 1e9) * 5;
+  // Market cap bonus using logarithmic scale but with less significance than before
+  const marketCapLog = Math.log10(Math.max(1, character.marketCap / 1e6));
+  const marketCapBonus = marketCapLog * 3;
   
-  return Math.round((baseScore + rankBonus + marketCapBonus) * randomFactor);
+  // Calculate total score with more weight on base stats and rank than random factor
+  const totalScore = (baseScore + rankBonus + marketCapBonus) * randomFactor;
+  
+  return Math.round(totalScore);
 };
 
 /**
@@ -111,7 +131,7 @@ export const getFavoriteCharacter = (characters: CryptoCharacter[]): CryptoChara
     return null;
   }
   
-  // Находим персонажа с наибольшим числом использований
+  // Находим перс��нажа с наибольшим числом использований
   const [favoriteId] = Object.entries(stats.favoriteCharacters)
     .sort(([, a], [, b]) => (b as number) - (a as number))[0];
   

@@ -21,27 +21,55 @@ const calculateStats = (coin: any): { strength: number; speed: number; intellige
     return Math.min(95, Math.max(50, Math.round(volumeToMarketCap * 1000 + 65)));
   };
   
-  // Calculate intelligence based on tech score and category
+  // Calculate intelligence based on tech score, age, rank and market maturity
   const calculateIntelligence = (coin: any): number => {
+    // Base intelligence value
+    let intelligence = 65;
+    
     // Smart contract platforms and DeFi get higher scores
-    const category = (coin.categories || []).map((c: string) => c.toLowerCase());
-    let bonus = 0;
+    const categories = (coin.categories || []).map((c: string) => c.toLowerCase());
     
-    if (category.some((c: string) => c.includes("smart contract") || c.includes("platform"))) {
-      bonus += 15;
+    // Technology category bonuses
+    if (categories.some(c => c.includes("smart contract") || c.includes("platform"))) {
+      intelligence += 12;
+    } else if (categories.some(c => c.includes("defi") || c.includes("finance"))) {
+      intelligence += 8;
+    } else if (categories.some(c => c.includes("oracle") || c.includes("ai"))) {
+      intelligence += 10;
+    } else if (categories.some(c => c.includes("privacy"))) {
+      intelligence += 7;
     }
-    if (category.some((c: string) => c.includes("defi") || c.includes("finance"))) {
-      bonus += 10;
+    
+    // Age factor - established coins have proven their tech (1-10 points based on age)
+    const launchDate = coin.genesis_date 
+      ? new Date(coin.genesis_date) 
+      : null;
+    
+    const ageInDays = launchDate
+      ? (new Date().getTime() - launchDate.getTime()) / (1000 * 3600 * 24)
+      : coin.market_cap_rank < 50 ? 1000 : 500; // Estimate for coins without genesis date
+    
+    // Calculate age bonus (max 10 points)
+    const ageFactor = Math.min(10, Math.log10(Math.max(1, ageInDays)));
+    intelligence += ageFactor;
+    
+    // Market rank bonus (higher ranks have survived market competition)
+    if (coin.market_cap_rank <= 5) {
+      intelligence += 15;
+    } else if (coin.market_cap_rank <= 20) {
+      intelligence += 10;
+    } else if (coin.market_cap_rank <= 50) {
+      intelligence += 5;
     }
     
-    // Age factor - established coins have proven their tech
-    const ageInDays = coin.genesis_date 
-      ? (new Date().getTime() - new Date(coin.genesis_date).getTime()) / (1000 * 3600 * 24)
-      : 365; // Default to 1 year
+    // Add some variance based on coin id to ensure unique values
+    // Hash-like approach to get a consistent but different value for each coin
+    const idSum = coin.id.split('').reduce((sum: number, char: string) => sum + char.charCodeAt(0), 0);
+    const variance = (idSum % 10) - 4; // Range -4 to +5
+    intelligence += variance;
     
-    const ageFactor = Math.min(20, Math.log10(ageInDays) * 5);
-    
-    return Math.min(98, Math.max(50, 65 + bonus + ageFactor));
+    // Final adjustment and rounding
+    return Math.min(98, Math.max(50, Math.round(intelligence)));
   };
   
   // Calculate charisma based on social metrics and community size
@@ -50,9 +78,11 @@ const calculateStats = (coin: any): { strength: number; speed: number; intellige
     let charisma = 65;
     
     // Meme coins get a charisma boost
-    const isMeme = (coin.categories || []).some((c: string) => 
-      c.toLowerCase().includes("meme") || c.toLowerCase().includes("dog")
+    const categories = (coin.categories || []).map((c: string) => c.toLowerCase());
+    const isMeme = categories.some(c => 
+      c.includes("meme") || c.includes("dog") || c.includes("animal")
     );
+    
     if (isMeme) charisma += 25;
     
     // Well-known coins have higher charisma
@@ -61,13 +91,13 @@ const calculateStats = (coin: any): { strength: number; speed: number; intellige
     else if (coin.market_cap_rank <= 50) charisma += 10;
     else if (coin.market_cap_rank <= 100) charisma += 5;
     
-    return Math.min(98, Math.max(50, charisma));
+    return Math.min(98, Math.max(50, Math.round(charisma)));
   };
   
-  const strength = normalizeMarketCap(coin.market_cap);
-  const speed = calculateSpeed(coin.total_volume, coin.market_cap);
+  const strength = Math.round(normalizeMarketCap(coin.market_cap));
+  const speed = Math.round(calculateSpeed(coin.total_volume, coin.market_cap));
   const intelligence = calculateIntelligence(coin);
-  const charisma = calculateCharisma(coin);
+  const charisma = Math.round(calculateCharisma(coin));
   
   return {
     strength,

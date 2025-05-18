@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CryptoCharacter } from "../types/character";
@@ -12,6 +11,7 @@ import PageLayout from "@/components/layouts/PageLayout";
 import CharacterSearch from "@/components/CharacterSearch";
 import CharacterSelector from "@/components/CharacterSelector";
 import { getCachedCoins } from "@/services/coingeckoService";
+import { calculateBattleScore } from "@/lib/game-utils";
 
 const Battle = () => {
   const navigate = useNavigate();
@@ -126,28 +126,6 @@ const Battle = () => {
         });
       }
     }, 2500);
-  };
-
-  // Calculate battle score based on stats
-  const calculateBattleScore = (character: CryptoCharacter): number => {
-    // Random factor for unpredictability (0.8 to 1.2)
-    const randomFactor = 0.8 + Math.random() * 0.4;
-    
-    // Rank bonus (lower rank = higher bonus)
-    const rankBonus = Math.max(0, 11 - character.rank) * 2;
-    
-    // Base score from stats
-    const baseScore = (
-      character.stats.strength * 1.2 +
-      character.stats.speed * 0.8 +
-      character.stats.intelligence * 1.0 +
-      character.stats.charisma * 0.5
-    );
-    
-    // Market cap bonus (logarithmic scale)
-    const marketCapBonus = Math.log10(character.marketCap / 1e9) * 5;
-    
-    return Math.round((baseScore + rankBonus + marketCapBonus) * randomFactor);
   };
 
   const resetBattle = () => {
