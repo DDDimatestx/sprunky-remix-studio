@@ -1,4 +1,5 @@
 
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -6,7 +7,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: '/games/', // Добавляем базовый путь для папки games
+  base: '/cryptoheroes/', // Добавляем базовый путь для папки cryptoheroes
   server: {
     host: "::",
     port: 8080,
@@ -22,3 +23,4 @@ export default defineConfig(({ mode }) => ({
     },
   },
 }));
+
