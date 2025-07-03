@@ -4,7 +4,6 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Coins, User } from 'lucide-react';
-import LanguageSelector from '@/components/LanguageSelector';
 
 interface PageLayoutProps {
   children: ReactNode;
@@ -41,8 +40,6 @@ const PageLayout = ({ children, title }: PageLayoutProps) => {
           </h1>
           
           <div className="flex items-center gap-3">
-            <LanguageSelector />
-            
             {isLoggedIn ? (
               <div className="flex items-center gap-3">
                 <div className="text-sm text-right">

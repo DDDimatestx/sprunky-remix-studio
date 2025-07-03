@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { CryptoCharacter } from "../types/character";
 import { Coins } from "lucide-react";
@@ -27,7 +28,7 @@ const BattleArena = ({ playerCharacter, opponentCharacter }: BattleArenaProps) =
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-4xl font-bold animate-pulse text-center">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-neon-pink to-neon-purple neon-text">
-            Битва идет...
+            Battle in Progress...
           </span>
         </div>
       </div>
