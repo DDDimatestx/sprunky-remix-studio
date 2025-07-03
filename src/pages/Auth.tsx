@@ -24,8 +24,8 @@ const Auth = () => {
     
     if (!email || !email.includes('@')) {
       toast({
-        title: "Ошибка",
-        description: "Пожалуйста, введите корректный email",
+        title: "Error",
+        description: "Please enter a valid email",
         variant: "destructive",
       });
       return;
@@ -33,20 +33,20 @@ const Auth = () => {
     
     setIsLoading(true);
     
-    // Имитация отправки кода на email
+    // Simulate sending code to email
     setTimeout(() => {
       setIsLoading(false);
       setStep("otp");
       
       toast({
-        title: "Код отправлен",
-        description: `Проверочный код отправлен на ${email}`,
+        title: "Code sent",
+        description: `Verification code sent to ${email}`,
       });
       
-      // Для демонстрации сразу показываем код
+      // For demo purposes, show the code immediately
       toast({
-        title: "Demo: Ваш код",
-        description: "Используйте код 123456 для входа",
+        title: "Demo: Your code",
+        description: "Use code 123456 to log in",
       });
     }, 1500);
   };
@@ -56,8 +56,8 @@ const Auth = () => {
     
     if (otp.length !== 6) {
       toast({
-        title: "Ошибка",
-        description: "Пожалуйста, введите 6-значный код",
+        title: "Error",
+        description: "Please enter a 6-digit code",
         variant: "destructive",
       });
       return;
@@ -65,23 +65,23 @@ const Auth = () => {
     
     setIsLoading(true);
     
-    // Имитация проверки кода
+    // Simulate code verification
     setTimeout(() => {
       setIsLoading(false);
       
-      // Для демонстрации любой 6-значный код будет считаться правильным
+      // For demo purposes, any 6-digit code will be accepted
       if (otp === "123456") {
-        // Если пользователь уже зарегистрирован, перенаправляем на главную
+        // If user is already registered, redirect to main page
         setStep("profile");
         
         toast({
-          title: "Код подтвержден",
-          description: "Код успешно подтвержден!",
+          title: "Code verified",
+          description: "Code successfully verified!",
         });
       } else {
         toast({
-          title: "Неверный код",
-          description: "Пожалуйста, проверьте код и попробуйте снова",
+          title: "Invalid code",
+          description: "Please check the code and try again",
           variant: "destructive",
         });
       }
@@ -93,8 +93,8 @@ const Auth = () => {
     
     if (!username || username.length < 3) {
       toast({
-        title: "Ошибка",
-        description: "Имя пользователя должно содержать минимум 3 символа",
+        title: "Error",
+        description: "Username must be at least 3 characters long",
         variant: "destructive",
       });
       return;
@@ -102,11 +102,11 @@ const Auth = () => {
     
     setIsLoading(true);
     
-    // Имитация сохранения профиля
+    // Simulate saving profile
     setTimeout(() => {
       setIsLoading(false);
       
-      // Сохраняем в localStorage для демонстрации
+      // Save to localStorage for demo
       localStorage.setItem("user", JSON.stringify({
         email,
         username,
@@ -114,54 +114,57 @@ const Auth = () => {
       }));
       
       toast({
-        title: "Добро пожаловать!",
-        description: `${username}, ваш профиль создан успешно!`,
+        title: "Welcome!",
+        description: `${username}, your profile has been created successfully!`,
       });
       
-      // Перенаправляем на главную
+      // Redirect to main page
       navigate("/");
     }, 1500);
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-game-primary/5 to-game-secondary/10">
-      <header className="w-full py-6 border-b border-game-primary/20">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-game-background via-purple-900/80 to-pink-900/80">
+      {/* Neon background effect */}
+      <div className="fixed inset-0 bg-gradient-to-br from-neon-pink/10 via-transparent to-neon-purple/10 pointer-events-none"></div>
+      
+      <header className="relative w-full py-6 border-b border-neon-pink/30 backdrop-blur-sm bg-black/20">
         <div className="container flex items-center justify-between">
           <Button 
             variant="outline" 
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 border-neon-pink/50 text-neon-pink hover:bg-neon-pink/20 hover:border-neon-pink transition-all neon-glow"
             onClick={() => navigate("/")}
           >
             <ArrowLeft className="h-4 w-4" />
-            Назад
+            Back
           </Button>
           <h1 className="text-3xl md:text-4xl font-bold text-center flex items-center gap-3">
-            <User className="h-8 w-8 text-game-primary" />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-game-primary to-game-secondary">
-              {step === "email" ? "Авторизация" : 
-               step === "otp" ? "Подтверждение" : 
-               "Создание профиля"}
+            <User className="h-8 w-8 text-neon-pink drop-shadow-lg" />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-neon-pink to-neon-purple neon-text">
+              {step === "email" ? "Authentication" : 
+               step === "otp" ? "Verification" : 
+               "Create Profile"}
             </span>
           </h1>
-          <div className="w-24"></div> {/* Пустой div для выравнивания */}
+          <div className="w-24"></div> {/* Empty div for alignment */}
         </div>
       </header>
 
-      <main className="flex-1 container py-8">
+      <main className="relative flex-1 container py-8">
         <div className="max-w-md mx-auto">
-          <div className="bg-white/50 backdrop-blur-sm rounded-xl p-8 border shadow-sm">
+          <div className="bg-black/40 backdrop-blur-sm rounded-xl p-8 border border-neon-pink/30 shadow-2xl neon-glow">
             {step === "email" && (
               <form onSubmit={handleEmailSubmit} className="space-y-6">
                 <div className="space-y-2 text-center">
-                  <h2 className="text-2xl font-bold">Добро пожаловать!</h2>
-                  <p className="text-muted-foreground">
-                    Войдите или зарегистрируйтесь, чтобы участвовать в лидерборде
+                  <h2 className="text-2xl font-bold text-white neon-text">Welcome!</h2>
+                  <p className="text-white/70">
+                    Login or register to participate in the leaderboard
                   </p>
                 </div>
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium">
+                    <label htmlFor="email" className="text-sm font-medium text-white">
                       Email
                     </label>
                     <Input
@@ -171,21 +174,22 @@ const Auth = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
+                      className="bg-black/50 border-neon-purple/50 text-white placeholder-white/50 focus:border-neon-pink"
                     />
                   </div>
                   
                   <Button 
                     type="submit" 
-                    className="w-full"
+                    className="w-full bg-gradient-to-r from-neon-pink to-neon-purple hover:from-neon-pink/80 hover:to-neon-purple/80 text-white font-semibold neon-glow"
                     disabled={isLoading}
                   >
                     {isLoading ? (
                       <>
                         <div className="w-4 h-4 rounded-full border-2 border-current border-t-transparent animate-spin mr-2"></div>
-                        Отправка кода...
+                        Sending code...
                       </>
                     ) : (
-                      "Отправить код"
+                      "Send Code"
                     )}
                   </Button>
                 </div>
@@ -195,9 +199,9 @@ const Auth = () => {
             {step === "otp" && (
               <form onSubmit={handleOtpSubmit} className="space-y-6">
                 <div className="space-y-2 text-center">
-                  <h2 className="text-2xl font-bold">Проверочный код</h2>
-                  <p className="text-muted-foreground">
-                    Введите 6-значный код, отправленный на {email}
+                  <h2 className="text-2xl font-bold text-white neon-text">Verification Code</h2>
+                  <p className="text-white/70">
+                    Enter the 6-digit code sent to {email}
                   </p>
                 </div>
                 
@@ -209,12 +213,12 @@ const Auth = () => {
                       onChange={(value) => setOtp(value)}
                     >
                       <InputOTPGroup>
-                        <InputOTPSlot index={0} />
-                        <InputOTPSlot index={1} />
-                        <InputOTPSlot index={2} />
-                        <InputOTPSlot index={3} />
-                        <InputOTPSlot index={4} />
-                        <InputOTPSlot index={5} />
+                        <InputOTPSlot index={0} className="border-neon-purple/50 text-white bg-black/50" />
+                        <InputOTPSlot index={1} className="border-neon-purple/50 text-white bg-black/50" />
+                        <InputOTPSlot index={2} className="border-neon-purple/50 text-white bg-black/50" />
+                        <InputOTPSlot index={3} className="border-neon-purple/50 text-white bg-black/50" />
+                        <InputOTPSlot index={4} className="border-neon-purple/50 text-white bg-black/50" />
+                        <InputOTPSlot index={5} className="border-neon-purple/50 text-white bg-black/50" />
                       </InputOTPGroup>
                     </InputOTP>
                   </div>
@@ -222,33 +226,33 @@ const Auth = () => {
                   <div className="space-y-2">
                     <Button 
                       type="submit" 
-                      className="w-full"
+                      className="w-full bg-gradient-to-r from-neon-pink to-neon-purple hover:from-neon-pink/80 hover:to-neon-purple/80 text-white font-semibold neon-glow"
                       disabled={isLoading}
                     >
                       {isLoading ? (
                         <>
                           <div className="w-4 h-4 rounded-full border-2 border-current border-t-transparent animate-spin mr-2"></div>
-                          Проверка кода...
+                          Verifying code...
                         </>
                       ) : (
-                        "Подтвердить"
+                        "Verify"
                       )}
                     </Button>
                     
                     <Button
                       type="button"
                       variant="outline"
-                      className="w-full"
+                      className="w-full border-neon-pink/50 text-neon-pink hover:bg-neon-pink/20 hover:border-neon-pink transition-all"
                       onClick={() => setStep("email")}
                       disabled={isLoading}
                     >
-                      Изменить email
+                      Change email
                     </Button>
                   </div>
                 </div>
                 
-                <div className="text-center text-sm text-muted-foreground">
-                  <p>Не получили код? <button type="button" className="text-primary font-medium hover:underline">Отправить повторно</button></p>
+                <div className="text-center text-sm text-white/70">
+                  <p>Didn't receive the code? <button type="button" className="text-neon-pink font-medium hover:underline">Resend</button></p>
                 </div>
               </form>
             )}
@@ -256,16 +260,16 @@ const Auth = () => {
             {step === "profile" && (
               <form onSubmit={handleProfileSubmit} className="space-y-6">
                 <div className="space-y-2 text-center">
-                  <h2 className="text-2xl font-bold">Создайте профиль</h2>
-                  <p className="text-muted-foreground">
-                    Как вас будут видеть другие игроки
+                  <h2 className="text-2xl font-bold text-white neon-text">Create Profile</h2>
+                  <p className="text-white/70">
+                    How other players will see you
                   </p>
                 </div>
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label htmlFor="username" className="text-sm font-medium">
-                      Имя пользователя
+                    <label htmlFor="username" className="text-sm font-medium text-white">
+                      Username
                     </label>
                     <Input
                       id="username"
@@ -273,21 +277,22 @@ const Auth = () => {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       required
+                      className="bg-black/50 border-neon-purple/50 text-white placeholder-white/50 focus:border-neon-pink"
                     />
                   </div>
                   
                   <Button 
                     type="submit" 
-                    className="w-full"
+                    className="w-full bg-gradient-to-r from-neon-pink to-neon-purple hover:from-neon-pink/80 hover:to-neon-purple/80 text-white font-semibold neon-glow"
                     disabled={isLoading}
                   >
                     {isLoading ? (
                       <>
                         <div className="w-4 h-4 rounded-full border-2 border-current border-t-transparent animate-spin mr-2"></div>
-                        Создание профиля...
+                        Creating profile...
                       </>
                     ) : (
-                      "Создать профиль"
+                      "Create Profile"
                     )}
                   </Button>
                 </div>
@@ -300,32 +305,32 @@ const Auth = () => {
               <Button 
                 variant="outline" 
                 onClick={() => navigate("/battle-vs-computer")}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 border-neon-pink/50 text-neon-pink hover:bg-neon-pink/20 hover:border-neon-pink transition-all neon-glow"
               >
                 <Gamepad className="h-4 w-4" />
-                Играть
+                Play
               </Button>
               
               <Button 
                 variant="outline" 
                 onClick={() => navigate("/leaderboard")}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 border-neon-pink/50 text-neon-pink hover:bg-neon-pink/20 hover:border-neon-pink transition-all neon-glow"
               >
                 <Trophy className="h-4 w-4" />
-                Лидерборд
+                Leaderboard
               </Button>
             </div>
             
-            <p className="text-sm text-muted-foreground">
-              Авторизация нужна только для участия в лидерборде. Вы можете играть без авторизации.
+            <p className="text-sm text-white/70">
+              Authentication is only needed to participate in the leaderboard. You can play without authentication.
             </p>
           </div>
         </div>
       </main>
 
-      <footer className="py-4 border-t border-game-primary/20">
-        <div className="container text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} КриптоХерои | Персонажи криптомонет из топ-100 CoinMarketCap
+      <footer className="relative py-4 border-t border-neon-purple/30 backdrop-blur-sm bg-black/20">
+        <div className="container text-center text-sm text-white/70">
+          &copy; {new Date().getFullYear()} CryptoHeroes | Characters of cryptocurrencies from CoinMarketCap top-100
         </div>
       </footer>
     </div>

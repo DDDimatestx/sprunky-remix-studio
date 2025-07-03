@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -199,38 +198,38 @@ const Leaderboard = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-game-primary/5 to-game-secondary/10">
-      <header className="w-full py-6 border-b border-game-primary/20">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-game-background via-purple-900/80 to-pink-900/80">
+      {/* Neon background effect */}
+      <div className="fixed inset-0 bg-gradient-to-br from-neon-pink/10 via-transparent to-neon-purple/10 pointer-events-none"></div>
+      
+      <header className="relative w-full py-6 border-b border-neon-pink/30 backdrop-blur-sm bg-black/20">
         <div className="container flex items-center justify-between">
           <Button 
             variant="outline" 
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 border-neon-pink/50 text-neon-pink hover:bg-neon-pink/20 hover:border-neon-pink transition-all neon-glow"
             onClick={() => navigate("/")}
           >
             <ArrowLeft className="h-4 w-4" />
             {t("common.back")}
           </Button>
           <h1 className="text-3xl md:text-4xl font-bold text-center flex items-center gap-3">
-            <Trophy className="h-8 w-8 text-game-yellow" />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-game-primary to-game-orange">
+            <Trophy className="h-8 w-8 text-neon-pink drop-shadow-lg" />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-neon-pink to-neon-purple neon-text">
               {t("leaderboard.title")}
             </span>
           </h1>
-          <div className="flex gap-2">
-            <LanguageSelector />
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2"
-              onClick={() => navigate("/battle-vs-computer")}
-            >
-              <Gamepad className="h-4 w-4" />
-              {t("common.play")}
-            </Button>
-          </div>
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2 border-neon-pink/50 text-neon-pink hover:bg-neon-pink/20 hover:border-neon-pink transition-all neon-glow"
+            onClick={() => navigate("/battle-vs-computer")}
+          >
+            <Gamepad className="h-4 w-4" />
+            {t("common.play")}
+          </Button>
         </div>
       </header>
 
-      <main className="flex-1 container py-8">
+      <main className="relative flex-1 container py-8">
         <div className="flex flex-col space-y-6">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold">{t("leaderboard.topPlayers")}</h2>
@@ -342,8 +341,8 @@ const Leaderboard = () => {
         </div>
       </main>
 
-      <footer className="py-4 border-t border-game-primary/20">
-        <div className="container text-center text-sm text-muted-foreground">
+      <footer className="relative py-4 border-t border-neon-purple/30 backdrop-blur-sm bg-black/20">
+        <div className="container text-center text-sm text-white/70">
           {t("common.copyright", { year: new Date().getFullYear() })}
         </div>
       </footer>
