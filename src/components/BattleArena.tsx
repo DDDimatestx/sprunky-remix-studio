@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { CryptoCharacter } from "../types/character";
 import { Coins } from "lucide-react";
@@ -21,12 +20,13 @@ const BattleArena = ({ playerCharacter, opponentCharacter }: BattleArenaProps) =
   }, []);
 
   return (
-    <div className="w-full max-w-4xl h-80 md:h-96 relative overflow-hidden rounded-2xl border-2 border-game-primary/30 bg-gradient-to-br from-game-background to-black/30">
-      <div className="absolute inset-0 bg-[url('/placeholder.svg')] opacity-20 bg-cover bg-center mix-blend-overlay"></div>
+    <div className="w-full max-w-4xl h-80 md:h-96 relative overflow-hidden rounded-2xl border-2 border-neon-pink/50 bg-gradient-to-br from-black/60 via-purple-900/40 to-pink-900/40 backdrop-blur-sm neon-glow">
+      {/* Неоновый фоновый эффект */}
+      <div className="absolute inset-0 bg-gradient-to-br from-neon-pink/10 via-transparent to-neon-purple/10"></div>
       
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-4xl font-bold animate-pulse text-center">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-game-primary to-game-secondary">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-neon-pink to-neon-purple neon-text">
             Битва идет...
           </span>
         </div>
@@ -41,7 +41,7 @@ const BattleArena = ({ playerCharacter, opponentCharacter }: BattleArenaProps) =
         }`}
       >
         <div 
-          className="relative h-32 w-32 md:h-40 md:w-40 rounded-full flex items-center justify-center"
+          className="relative h-32 w-32 md:h-40 md:w-40 rounded-full flex items-center justify-center border-2 border-neon-pink/30"
           style={{ 
             background: `radial-gradient(circle, ${playerCharacter.color}40 0%, ${playerCharacter.color}10 70%, transparent 100%)`
           }}
@@ -50,15 +50,15 @@ const BattleArena = ({ playerCharacter, opponentCharacter }: BattleArenaProps) =
             <img 
               src={playerCharacter.image} 
               alt={playerCharacter.name} 
-              className="h-24 md:h-32 z-10"
+              className="h-24 md:h-32 z-10 drop-shadow-lg"
             />
           ) : (
             <Coins 
-              className="h-16 w-16 md:h-24 md:w-24 z-10" 
+              className="h-16 w-16 md:h-24 md:w-24 z-10 drop-shadow-lg" 
               style={{ color: playerCharacter.color }}
             />
           )}
-          <div className="absolute -bottom-6 left-0 right-0 text-center font-bold text-sm md:text-base">
+          <div className="absolute -bottom-6 left-0 right-0 text-center font-bold text-sm md:text-base text-white neon-text">
             {playerCharacter.symbol}
           </div>
         </div>
@@ -73,7 +73,8 @@ const BattleArena = ({ playerCharacter, opponentCharacter }: BattleArenaProps) =
                   style={{ 
                     backgroundColor: playerCharacter.color,
                     animationDelay: `${i * 0.1}s`,
-                    opacity: 1 - i * 0.2
+                    opacity: 1 - i * 0.2,
+                    boxShadow: `0 0 10px ${playerCharacter.color}`
                   }}
                 ></div>
               ))}
@@ -91,7 +92,7 @@ const BattleArena = ({ playerCharacter, opponentCharacter }: BattleArenaProps) =
         }`}
       >
         <div 
-          className="relative h-32 w-32 md:h-40 md:w-40 rounded-full flex items-center justify-center"
+          className="relative h-32 w-32 md:h-40 md:w-40 rounded-full flex items-center justify-center border-2 border-neon-purple/30"
           style={{ 
             background: `radial-gradient(circle, ${opponentCharacter.color}40 0%, ${opponentCharacter.color}10 70%, transparent 100%)`
           }}
@@ -100,15 +101,15 @@ const BattleArena = ({ playerCharacter, opponentCharacter }: BattleArenaProps) =
             <img 
               src={opponentCharacter.image} 
               alt={opponentCharacter.name} 
-              className="h-24 md:h-32 z-10"
+              className="h-24 md:h-32 z-10 drop-shadow-lg"
             />
           ) : (
             <Coins 
-              className="h-16 w-16 md:h-24 md:w-24 z-10" 
+              className="h-16 w-16 md:h-24 md:w-24 z-10 drop-shadow-lg" 
               style={{ color: opponentCharacter.color }}
             />
           )}
-          <div className="absolute -bottom-6 left-0 right-0 text-center font-bold text-sm md:text-base">
+          <div className="absolute -bottom-6 left-0 right-0 text-center font-bold text-sm md:text-base text-white neon-text">
             {opponentCharacter.symbol}
           </div>
         </div>
@@ -123,7 +124,8 @@ const BattleArena = ({ playerCharacter, opponentCharacter }: BattleArenaProps) =
                   style={{ 
                     backgroundColor: opponentCharacter.color,
                     animationDelay: `${i * 0.1}s`,
-                    opacity: 1 - i * 0.2
+                    opacity: 1 - i * 0.2,
+                    boxShadow: `0 0 10px ${opponentCharacter.color}`
                   }}
                 ></div>
               ))}
@@ -136,9 +138,10 @@ const BattleArena = ({ playerCharacter, opponentCharacter }: BattleArenaProps) =
       {battlePhase === 0 && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <div 
-            className="w-16 h-16 rounded-full animate-pulse"
+            className="w-16 h-16 rounded-full animate-pulse border-2 border-white/50"
             style={{ 
-              background: `radial-gradient(circle, ${playerCharacter.color}50 0%, ${opponentCharacter.color}50 100%)`
+              background: `radial-gradient(circle, ${playerCharacter.color}50 0%, ${opponentCharacter.color}50 100%)`,
+              boxShadow: `0 0 30px rgba(255, 0, 128, 0.5)`
             }}
           ></div>
         </div>
@@ -149,15 +152,21 @@ const BattleArena = ({ playerCharacter, opponentCharacter }: BattleArenaProps) =
         <div className="flex items-center gap-1">
           <div 
             className="w-3 h-3 rounded-full animate-pulse" 
-            style={{ backgroundColor: playerCharacter.color }}
+            style={{ 
+              backgroundColor: playerCharacter.color,
+              boxShadow: `0 0 10px ${playerCharacter.color}`
+            }}
           ></div>
-          <span className="text-sm font-medium">{playerCharacter.name}</span>
+          <span className="text-sm font-medium text-white">{playerCharacter.name}</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-sm font-medium">{opponentCharacter.name}</span>
+          <span className="text-sm font-medium text-white">{opponentCharacter.name}</span>
           <div 
             className="w-3 h-3 rounded-full animate-pulse" 
-            style={{ backgroundColor: opponentCharacter.color }}
+            style={{ 
+              backgroundColor: opponentCharacter.color,
+              boxShadow: `0 0 10px ${opponentCharacter.color}`
+            }}
           ></div>
         </div>
       </div>

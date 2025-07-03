@@ -61,7 +61,17 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				'game-primary': '#ff0080',
+				'game-secondary': '#8b00ff',
+				'game-accent': '#ff6b35',
+				'game-background': '#1a0033',
+				'game-yellow': '#ffff00',
+				'game-orange': '#ff4500',
+				'neon-pink': '#ff007f',
+				'neon-purple': '#bf00ff',
+				'neon-red': '#ff1744',
+				'neon-blue': '#00e5ff'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
